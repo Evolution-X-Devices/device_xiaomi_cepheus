@@ -19,4 +19,7 @@
     <string name="config_batteryCalculatedCapacity">/sys/class/power_supply/bms/charge_full</string>
     <string name="config_batteryDesignCapacity">/sys/class/power_supply/bms/charge_full_design</string>
     <string name="config_batteryChargeCycles">/sys/class/power_supply/bms/cycle_count</string>
-</resources>  
+
+    <!-- Smart Charging -->
+    <bool name="config_supportSmartCharging">true</bool>
+</resources>
