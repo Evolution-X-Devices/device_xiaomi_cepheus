@@ -390,12 +390,16 @@ PRODUCT_COPY_FILES += \
     frameworks/native/data/etc/com.android.nfc_extras.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/com.android.nfc_extras.xml \
     frameworks/native/data/etc/com.nxp.mifare.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/com.nxp.mifare.xml
 
-# Overlay
-DEVICE_PACKAGE_OVERLAYS += \
-    $(LOCAL_PATH)/overlay \
-    $(LOCAL_PATH)/overlay-evolution
-
 PRODUCT_ENFORCE_RRO_TARGETS := *
+
+PRODUCT_PACKAGES += \
+    CarrierConfigOverlay \
+    FrameworksResCepheus \
+    SettingsResCepheus \
+    SystemUIResCepheus \
+    TelephonyResCommon \
+    TetheringConfigOverlay \
+    WifiResCepheus
 
 # Partitions
 PRODUCT_USE_DYNAMIC_PARTITIONS := true
@@ -430,7 +434,6 @@ PRODUCT_PACKAGES += \
 
 # RIL
 PRODUCT_PACKAGES += \
-    CarrierConfigOverlay \
     android.hardware.radio@1.5.vendor \
     android.hardware.radio.config@1.2.vendor \
     android.hardware.radio.deprecated@1.0.vendor \
@@ -549,8 +552,6 @@ PRODUCT_PACKAGES += \
     IPACM_cfg.xml \
     libwifi-hal-qcom \
     libwpa_client \
-    TetheringConfigOverlay \
-    WifiOverlay \
     wpa_cli \
     wpa_supplicant \
     wpa_supplicant.conf
