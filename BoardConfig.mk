@@ -65,6 +65,7 @@ TARGET_NO_BOOTLOADER := true
 
 # Camera
 USE_DEVICE_SPECIFIC_CAMERA := true
+TARGET_CAMERA_SERVICE_EXT_LIB := //$(DEVICE_PATH):libcameraservice_extension.cepheus
 
 # Display
 TARGET_HAS_HDR_DISPLAY := true
