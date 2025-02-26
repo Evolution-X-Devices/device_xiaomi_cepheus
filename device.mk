@@ -302,25 +302,17 @@ PRODUCT_PACKAGES += \
 
 # Media
 PRODUCT_PACKAGES += \
-    libOmxAacEnc \
-    libOmxAmrEnc \
-    libOmxCore \
-    libOmxEvrcEnc \
-    libOmxG711Enc \
-    libOmxQcelp13Enc \
-    libOmxVdec \
-    libOmxVenc \
-    libstagefrighthw \
-    vendor.qti.hardware.capabilityconfigstore@1.0.vendor
-
-# Media
-PRODUCT_PACKAGES += \
     libcodec2_vndk.vendor \
     libcodec2_hidl@1.0.vendor \
     libavservices_minijail \
     libavservices_minijail_32 \
     libavservices_minijail.vendor \
-    libavservices_minijail_vendor
+    libavservices_minijail_vendor \
+    libOmxCore \
+    libOmxVdec \
+    libOmxVenc \
+    libstagefrighthw \
+    vendor.qti.hardware.capabilityconfigstore@1.0.vendor
 
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/configs/media/media_codecs.xml:$(TARGET_COPY_OUT_VENDOR)/etc/media_codecs.xml \
