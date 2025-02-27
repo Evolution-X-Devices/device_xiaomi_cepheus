@@ -160,7 +160,8 @@ PRODUCT_COPY_FILES += \
 
 # Dolby
 PRODUCT_PACKAGES += \
-    libstagefright_foundation-v33
+    libstagefright_foundation-v33 \
+    XiaomiDolby
 
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/configs/dolby/dax-default.xml:$(TARGET_COPY_OUT_VENDOR)/etc/dolby/dax-default.xml \
@@ -301,15 +302,17 @@ PRODUCT_PACKAGES += \
 
 # Media
 PRODUCT_PACKAGES += \
-    libcodec2_vndk.vendor \
-    libcodec2_hidl@1.0.vendor \
     libavservices_minijail \
     libavservices_minijail_32 \
     libavservices_minijail.vendor \
     libavservices_minijail_vendor \
+    libcodec2_hidl@1.0.vendor \
+    libcodec2_soft_common.vendor \
+    libcodec2_vndk.vendor \
     libOmxCore \
     libOmxVdec \
     libOmxVenc \
+    libsfplugin_ccodec_utils.vendor \
     libstagefrighthw \
     vendor.qti.hardware.capabilityconfigstore@1.0.vendor
 

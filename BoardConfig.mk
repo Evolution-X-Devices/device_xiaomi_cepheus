@@ -51,7 +51,6 @@ TARGET_2ND_CPU_VARIANT_RUNTIME := cortex-a76
 TARGET_OTA_ASSERT_DEVICE := cepheus
 
 # Audio
-AUDIO_FEATURE_ENABLED_DS2_DOLBY_DAP := true
 AUDIO_FEATURE_ENABLED_INSTANCE_ID := true
 TARGET_PROVIDES_AUDIO_EXTNS := true
 BOARD_USES_ALSA_AUDIO := true
@@ -96,6 +95,7 @@ DEVICE_MATRIX_FILE := hardware/qcom-caf/common/compatibility_matrix.xml
 DEVICE_FRAMEWORK_COMPATIBILITY_MATRIX_FILE := \
     $(DEVICE_PATH)/configs/hidl/framework_compatibility_matrix.xml \
     hardware/qcom-caf/common/vendor_framework_compatibility_matrix.xml \
+    hardware/xiaomi/vintf/xiaomi_framework_compatibility_matrix.xml \
     vendor/lineage/config/device_framework_matrix.xml
 
 # Init
