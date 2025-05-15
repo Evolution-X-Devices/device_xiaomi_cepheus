@@ -335,7 +335,7 @@ PRODUCT_COPY_FILES += \
 
 # MiuiCamera
 TARGET_CAMERA_PACKAGE_NAME := com.android.camera
-TARGET_CAMERA_OVERRIDE_FORMAT_FROM_RESERVED := true
+$(call soong_config_set,camera,override_format_from_reserved,true)
 TARGET_USES_MIUI_CAMERA := true
 $(call inherit-product-if-exists, vendor/xiaomi/miuicamera-cepheus/config.mk)
 
