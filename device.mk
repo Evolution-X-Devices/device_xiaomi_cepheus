@@ -181,9 +181,9 @@ PRODUCT_PROPERTY_OVERRIDES += ro.incremental.enable=1
 
 # Enable blurs, hidden under dev option
 PRODUCT_PRODUCT_PROPERTIES += \
-    ro.launcher.blur.appLaunch=0 \
+    ro.launcher.blur.appLaunch=1 \
     ro.surface_flinger.supports_background_blur=1 \
-    persist.sys.sf.disable_blurs=1 \
+    persist.sys.sf.disable_blurs=0 \
     ro.sf.blurs_are_expensive=1
 
 # Fastbootd
