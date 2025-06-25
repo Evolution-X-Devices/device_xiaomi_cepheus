@@ -5,7 +5,8 @@
   },
   {
     "repository": "kernel_xiaomi_cepheus",
-    "target_path": "kernel/xiaomi/cepheus"
+    "target_path": "kernel/xiaomi/cepheus",
+    "branch": "bka"
   },
   {
     "repository": "hardware_xiaomi",
