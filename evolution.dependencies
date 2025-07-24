@@ -17,5 +17,11 @@
     "target_path": "vendor/xiaomi/miuicamera-cepheus",
     "branch": "leica-5.0-cepheus",
     "remote": "gitlab"
+  },
+  {
+    "repository": "crdroidandroid/android_prebuilts_clang_host_linux-x86_clang-r547379",
+    "target_path": "prebuilts/clang/host/linux-x86/clang-r547379",
+    "branch": "15.0",
+    "remote": "gitlab"
   }
 ]
