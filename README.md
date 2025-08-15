@@ -2,6 +2,8 @@ Copyright &copy; 2020 DerpFest
 
 Copyright &copy; 2020-2021 PixelExperience
 
+Copyright &copy; 2025 Evolution X
+
 Device configuration for Xiaomi Mi 9
 =========================================
 
@@ -26,4 +28,4 @@ Camera  | 48MP(Primary),12MP(Telephoto), 16MP(Ultrawide), dual-LED (dual tone) f
 ## Device picture
 
 
-![Xiaomi Mi 9](https://i01.appmifile.com/webfile/globalimg/products/pc/mi9/head_hd.png "Xiaomi Mi 9")
+![Xiaomi Mi 9](https://fdn2.gsmarena.com/vv/pics/xiaomi/xiaomi-mi-9-2.jpg "Xiaomi Mi 9")

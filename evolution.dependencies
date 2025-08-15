@@ -1,0 +1,26 @@
+[
+  {
+    "repository": "vendor_xiaomi_cepheus",
+    "target_path": "vendor/xiaomi/cepheus"
+  },
+  {
+    "repository": "kernel_xiaomi_cepheus",
+    "target_path": "kernel/xiaomi/cepheus"
+  },
+  {
+    "repository": "hardware_xiaomi",
+    "target_path": "hardware/xiaomi"
+  },
+  {
+    "repository": "vendor_xiaomi_miuicamera",
+    "target_path": "vendor/xiaomi/miuicamera",
+    "remote": "evo-codeberg",
+    "branch": "leica-5.0-cepheus"
+  },
+  {
+    "repository": "yaosp/vendor_qcom_common",
+    "target_path": "vendor/qcom/common",
+    "remote": "gitlab",
+    "branch": "sixteen"
+  }
+]

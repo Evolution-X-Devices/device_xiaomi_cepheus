@@ -7,9 +7,6 @@
 # Camera
 /mnt/vendor/persist/camera(/.*)?                                                                       u:object_r:camera_persist_file:s0
 
-# Camera - Miui
-/vendor/lib64(/.*)?                                                     u:object_r:same_process_hal_file:s0
-
 # Contexthub
 /vendor/bin/hw/android\.hardware\.contexthub@1\.1-service\.generic                                     u:object_r:hal_contexthub_default_exec:s0
 
@@ -25,22 +22,15 @@
 /vendor/bin/hw/android\.hardware\.biometrics\.fingerprint@2\.3-service\.cepheus                        u:object_r:hal_fingerprint_default_exec:s0
 
 # HALs
-/vendor/bin/hw/android\.hardware\.light-service\.xiaomi                    				   u:object_r:hal_light_default_exec:s0
+/vendor/bin/hw/android\.hardware\.light-service\.lineage                    				   u:object_r:hal_light_default_exec:s0
 
 # Hexagon DSP-side executable needed for Halide operation
 # This is labeled as public_adsprpcd_file as it needs to be read by apps
 # (e.g. Google Camera App)
 /mnt/vendor/dsp/fastrpc_shell_3                                                                        u:object_r:public_adsprpcd_file:s0
 
-# HBM
-/sys/devices/platform/soc/soc:qcom,dsi-display-primary/hbm                                             u:object_r:vendor_sysfs_hbm:s0
-
 # IR
-/dev/ir_spi                                                                                            u:object_r:ir_spi_device:s0
-/dev/lirc0                                                                                             u:object_r:ir_spi_device:s0
-
-# Livedisplay
-/vendor/bin/hw/vendor\.lineage\.livedisplay@2\.1-service\.cepheus                                      u:object_r:hal_lineage_livedisplay_qti_exec:s0
+/dev/ir_spi                                                                                            u:object_r:lirc_device:s0
 
 # Mlipay
 /vendor/bin/mlipayd@1\.1                                                                               u:object_r:hal_mlipay_default_exec:s0

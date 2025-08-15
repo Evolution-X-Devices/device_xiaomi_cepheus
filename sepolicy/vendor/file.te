@@ -30,9 +30,6 @@ type proc_last_kmsg, fs_type, proc_type;
 type fingerprint_data_file, data_file_type, file_type;
 type sysfs_fod, sysfs_type, fs_type;
 
-# Livedisplay
-type vendor_sysfs_hbm, sysfs_type, fs_type;
-
 # IR
 type ir_spi_device, dev_type, file_type;
 

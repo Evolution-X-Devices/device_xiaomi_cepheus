@@ -28,9 +28,6 @@ BUILD_BROKEN_ELF_PREBUILT_PRODUCT_COPY_FILES := true
 # Inherit from proprietary files
 include vendor/xiaomi/cepheus/BoardConfigVendor.mk
 
-# ANT+
-BOARD_ANT_WIRELESS_DEVICE := "vfs-prerelease"
-
 # Architecture
 TARGET_ARCH := arm64
 TARGET_ARCH_VARIANT := armv8-2a
@@ -58,14 +55,14 @@ TARGET_BOOTLOADER_BOARD_NAME := cepheus
 TARGET_NO_BOOTLOADER := true
 
 # Camera
-TARGET_CAMERA_OVERRIDE_FORMAT_FROM_RESERVED := true
-TARGET_CAMERA_SERVICE_EXT_LIB := //$(DEVICE_PATH):libcameraservice_extension.cepheus
-:
+$(call soong_config_set,camera,override_format_from_reserved,true)
+$(call soong_config_set,libcameraservice,ext_lib,//$(DEVICE_PATH):libcameraservice_extension.cepheus)
 
 # Compression
 PRODUCT_FS_COMPRESSION := 1
 
 # Display
+TARGET_GRALLOC_HANDLE_HAS_RESERVED_SIZE := true
 TARGET_HAS_HDR_DISPLAY := true
 TARGET_HAS_WIDE_COLOR_DISPLAY := true
 
@@ -79,7 +76,7 @@ TARGET_ENABLE_MEDIADRM_64 := true
 TARGET_FS_CONFIG_GEN := $(DEVICE_PATH)/configs/config.fs
 
 # FOD
-TARGET_SURFACEFLINGER_UDFPS_LIB := //$(DEVICE_PATH):libudfps_extension.cepheus
+$(call soong_config_set,surfaceflinger,udfps_lib,//$(DEVICE_PATH):libudfps_extension.cepheus)
 TARGET_USES_FOD_ZPOS := true
 
 # GPS
@@ -88,14 +85,13 @@ LOC_HIDL_VERSION := 4.0
 
 # HIDL
 DEVICE_MANIFEST_FILE := $(DEVICE_PATH)/configs/hidl/manifest.xml
-DEVICE_MATRIX_FILE := hardware/qcom-caf/common//compatibility_matrix.xml
-DEVICE_FRAMEWORK_COMPATIBILITY_MATRIX_FILE := \
+DEVICE_MATRIX_FILE := hardware/qcom-caf/common/compatibility_matrix.xml
+DEVICE_FRAMEWORK_COMPATIBILITY_MATRIX_FILE += \
     $(DEVICE_PATH)/configs/hidl/framework_compatibility_matrix.xml \
-    hardware/qcom-caf/common/vendor_framework_compatibility_matrix.xml \
-    vendor/aosp/config/device_framework_matrix.xml
+    hardware/qcom-caf/common/vendor_framework_compatibility_matrix.xml
 
 # Init
-TARGET_INIT_VENDOR_LIB := //$(DEVICE_PATH):libinit_cepheus
+$(call soong_config_set,libinit,vendor_init_lib,//$(DEVICE_PATH):libinit_cepheus)
 TARGET_RECOVERY_DEVICE_MODULES := libinit_cepheus
 
 # Kernel
@@ -109,8 +105,8 @@ BOARD_RAMDISK_OFFSET := 0x01000000
 TARGET_KERNEL_CLANG_COMPILE := true
 TARGET_KERNEL_CONFIG := cepheus_defconfig
 TARGET_KERNEL_SOURCE := kernel/xiaomi/cepheus
-TARGET_KERNEL_CLANG_VERSION := r530567
-KERNEL_TOOLCHAIN := $(shell pwd)/prebuilts/clang/host/linux-x86/clang-r530567/bin
+TARGET_KERNEL_CLANG_VERSION := r536225
+KERNEL_TOOLCHAIN := $(shell pwd)/prebuilts/clang/host/linux-x86/clang-r536225/bin
 KERNEL_SUPPORTS_LLD := true
 KERNEL_SUPPORTS_LLVM_TOOLS := true
 
@@ -125,8 +121,8 @@ BOARD_KERNEL_CMDLINE += kpti=off
 BOARD_KERNEL_CMDLINE += androidboot.boot_devices=soc/1d84000.ufshc
 
 # Lineage Health
-TARGET_HEALTH_CHARGING_CONTROL_SUPPORTS_BYPASS := false
-TARGET_HEALTH_CHARGING_CONTROL_CHARGING_PATH := /sys/class/power_supply/battery/charging_enabled
+$(call soong_config_set,lineage_health,charging_control_supports_bypass,false)
+$(call soong_config_set,lineage_health,charging_control_charging_path,/sys/class/power_supply/battery/charging_enabled)
 
 # Media
 TARGET_USES_ION := true
@@ -140,26 +136,22 @@ BOARD_RECOVERYIMAGE_PARTITION_SIZE := 67108864
 BOARD_USERDATAIMAGE_PARTITION_SIZE := 57453555712
 BOARD_FLASH_BLOCK_SIZE := 262144 # (BOARD_KERNEL_PAGESIZE * 64)
 
-# BOARD_SYSTEMIMAGE_PARTITION_SIZE := 3758096384
-# BOARD_VENDORIMAGE_PARTITION_SIZE := 1610612736
 BOARD_SUPER_PARTITION_GROUPS := cepheus_dynamic_partitions
 BOARD_CEPHEUS_DYNAMIC_PARTITIONS_PARTITION_LIST := system vendor system_ext odm product
-BOARD_SUPER_PARTITION_SIZE := 5368709120
+BOARD_SUPER_PARTITION_SIZE := 6442450944
 BOARD_SUPER_PARTITION_METADATA_DEVICE := system
-BOARD_SUPER_PARTITION_BLOCK_DEVICES := system vendor
+BOARD_SUPER_PARTITION_BLOCK_DEVICES := system vendor cust
 BOARD_SUPER_PARTITION_SYSTEM_DEVICE_SIZE := 3758096384
 BOARD_SUPER_PARTITION_VENDOR_DEVICE_SIZE := 1610612736
-BOARD_CEPHEUS_DYNAMIC_PARTITIONS_SIZE := 5364514816 # BOARD_SUPER_PARTITION_SIZE - 4MB
+BOARD_SUPER_PARTITION_CUST_DEVICE_SIZE := 1073741824
+BOARD_CEPHEUS_DYNAMIC_PARTITIONS_SIZE := 6438256640 # BOARD_SUPER_PARTITION_SIZE - 4MB
 BOARD_EROFS_PCLUSTER_SIZE := 262144
 BOARD_EROFS_COMPRESSOR := lz4
 
 BOARD_CACHEIMAGE_FILE_SYSTEM_TYPE := f2fs
 BOARD_USERDATAIMAGE_FILE_SYSTEM_TYPE := f2fs
-BOARD_SYSTEMIMAGE_FILE_SYSTEM_TYPE := erofs
-BOARD_VENDORIMAGE_FILE_SYSTEM_TYPE := erofs
-BOARD_ODMIMAGE_FILE_SYSTEM_TYPE := erofs
-BOARD_PRODUCTIMAGE_FILE_SYSTEM_TYPE := erofs
-BOARD_SYSTEM_EXTIMAGE_FILE_SYSTEM_TYPE := erofs
+$(foreach p, $(call to-upper, $(BOARD_CEPHEUS_DYNAMIC_PARTITIONS_PARTITION_LIST)), \
+    $(eval BOARD_$(p)IMAGE_FILE_SYSTEM_TYPE := erofs))
 
 BOARD_USES_METADATA_PARTITION := true
 
@@ -199,7 +191,7 @@ TARGET_RELEASETOOLS_EXTENSIONS := $(DEVICE_PATH)
 ENABLE_VENDOR_RIL_SERVICE := true
 
 # Security patch level
-VENDOR_SECURITY_PATCH := 2021-10-01
+VENDOR_SECURITY_PATCH := $(PLATFORM_SECURITY_PATCH)
 
 # Sepolicy
 TARGET_SEPOLICY_DIR := msmnile
