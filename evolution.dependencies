@@ -12,15 +12,9 @@
     "target_path": "hardware/xiaomi"
   },
   {
-    "repository": "vendor_xiaomi_miuicamera",
+    "repository": "nhansp/android_vendor_xiaomi_miuicamera",
     "target_path": "vendor/xiaomi/miuicamera",
-    "remote": "evo-codeberg",
-    "branch": "leica-5.0-cepheus"
-  },
-  {
-    "repository": "yaosp/vendor_qcom_common",
-    "target_path": "vendor/qcom/common",
-    "remote": "gitlab",
-    "branch": "sixteen"
+    "branch": "leica-5.0-cepheus",
+    "remote": "gitlab"
   }
 ]
