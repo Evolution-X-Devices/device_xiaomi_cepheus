@@ -28,6 +28,7 @@ BUILD_SEEDVAULT := true
 TARGET_BOOT_ANIMATION_RES := 1080
 TARGET_HAS_UDFPS := true
 TARGET_INCLUDE_ACCORD = false
+TARGET_USES_MINI_GAPPS := true
 
 # Device identifier
 PRODUCT_NAME := lineage_cepheus
