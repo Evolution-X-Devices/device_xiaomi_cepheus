@@ -183,6 +183,9 @@ on property:sys.boot_completed=1
     # Enable oom_reaper
     write /sys/module/lowmemorykiller/parameters/oom_reaper 1
 
+    # Always set LBM for doze
+    write /sys/devices/platform/soc/soc:qcom,dsi-display/doze_mode 0
+
     setprop vendor.setup.power 1
 
 service vendor.pd_mapper /vendor/bin/pd-mapper

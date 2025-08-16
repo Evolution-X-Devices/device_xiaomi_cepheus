@@ -382,8 +382,7 @@ PRODUCT_PACKAGES += \
 
 # Parts
 PRODUCT_PACKAGES += \
-    XiaomiDolby \
-    XiaomiParts
+    XiaomiDolby
 
 # Partitions
 PRODUCT_USE_DYNAMIC_PARTITIONS := true
