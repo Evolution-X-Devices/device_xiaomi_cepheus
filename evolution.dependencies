@@ -13,7 +13,7 @@
   },
   {
     "repository": "nhansp/android_vendor_xiaomi_miuicamera",
-    "target_path": "vendor/xiaomi/miuicamera",
+    "target_path": "vendor/xiaomi/miuicamera-cepheus",
     "branch": "leica-5.0-cepheus",
     "remote": "gitlab"
   }
