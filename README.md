@@ -2,6 +2,8 @@ Copyright &copy; 2020 DerpFest
 
 Copyright &copy; 2020-2021 PixelExperience
 
+Copyright &copy; 2025 PixelOS
+
 Copyright &copy; 2025 Evolution X
 
 Device configuration for Xiaomi Mi 9
