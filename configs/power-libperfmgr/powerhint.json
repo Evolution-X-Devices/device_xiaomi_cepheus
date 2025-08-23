@@ -87,7 +87,7 @@
       "Name": "GPUMaxFreq",
       "Path": "/sys/class/kgsl/kgsl-3d0/devfreq/max_freq",
       "Values": [
-      	"675000000",
+      	"999999999",
         "585000000",
         "427000000"
       ],
@@ -503,7 +503,7 @@
       "PowerHint": "EXPENSIVE_RENDERING",
       "Node": "GPUMaxFreq",
       "Duration": 0,
-      "Value": "675000000"
+      "Value": "999999999"
     },
     {
       "PowerHint": "ML_ACC",
