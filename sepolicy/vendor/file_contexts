@@ -39,7 +39,7 @@
 /sys/devices/platform/soc/soc:qcom,dsi-display-primary/hbm                                             u:object_r:vendor_sysfs_hbm:s0
 
 # IR
-/dev/ir_spi                                                                                            u:object_r:ir_spi_device:s0
+/dev/ir_spi                                                                                            u:object_r:lirc_device:s0
 
 # Livedisplay
 /vendor/bin/hw/vendor\.lineage\.livedisplay@2\.1-service\.cepheus                                      u:object_r:hal_lineage_livedisplay_qti_exec:s0
