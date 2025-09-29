@@ -21,9 +21,6 @@
      for different hardware and product builds.  Do not translate. -->
 
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-     <!-- If AOD can show an ambient version of the wallpaper -->
-    <bool name="config_dozeSupportsAodWallpaper">true</bool>
-
     <!-- Is the notification LED intrusive? Used to decide if there should be a disable option -->
     <bool name="config_intrusiveNotificationLed">true</bool>
 
