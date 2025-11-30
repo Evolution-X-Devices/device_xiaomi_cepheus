@@ -55,7 +55,6 @@ TARGET_BOOTLOADER_BOARD_NAME := cepheus
 TARGET_NO_BOOTLOADER := true
 
 # Camera
-$(call soong_config_set,camera,override_format_from_reserved,true)
 $(call soong_config_set,libcameraservice,ext_lib,//$(DEVICE_PATH):libcameraservice_extension.cepheus)
 
 # Compression
@@ -121,7 +120,7 @@ BOARD_KERNEL_CMDLINE += kpti=off
 BOARD_KERNEL_CMDLINE += androidboot.boot_devices=soc/1d84000.ufshc
 
 # Lineage Health
-$(call soong_config_set,lineage_health,charging_control_supports_bypass,false)
+$(call soong_config_set_bool,lineage_health,charging_control_supports_bypass,false)
 $(call soong_config_set,lineage_health,charging_control_charging_path,/sys/class/power_supply/battery/charging_enabled)
 
 # Media
