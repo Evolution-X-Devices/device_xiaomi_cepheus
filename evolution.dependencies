@@ -4,8 +4,10 @@
     "target_path": "vendor/xiaomi/cepheus"
   },
   {
-    "repository": "kernel_xiaomi_cepheus",
-    "target_path": "kernel/xiaomi/cepheus"
+    "repository": "LineageOS/android_kernel_qcom_sm8150",
+    "target_path": "kernel/xiaomi/sm8150",
+    "branch": "lineage-20",
+    "remote": "github-non-los"
   },
   {
     "repository": "hardware_xiaomi",

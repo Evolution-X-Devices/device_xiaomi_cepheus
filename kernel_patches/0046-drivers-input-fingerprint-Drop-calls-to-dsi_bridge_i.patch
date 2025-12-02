@@ -1,0 +1,106 @@
+From 721ccc7aa4b0e42d4354ef6999ff37ba2579c89b Mon Sep 17 00:00:00 2001
+From: Sebastiano Barezzi <seba@sebaubuntu.dev>
+Date: Mon, 6 Nov 2023 21:43:27 +0100
+Subject: [PATCH 046/115] drivers: input: fingerprint: Drop calls to
+ dsi_bridge_interface_enable
+
+Change-Id: I2cf43d7c7bcdabb08ee03f5e193fe23aac431750
+---
+ drivers/input/fingerprint/fpc_tee/fpc1020_tee.c |  9 ---------
+ drivers/input/fingerprint/goodix_ta/gf_spi.c    | 12 ------------
+ drivers/input/fingerprint/goodix_ta/gf_spi.h    |  1 -
+ 3 files changed, 22 deletions(-)
+
+diff --git a/drivers/input/fingerprint/fpc_tee/fpc1020_tee.c b/drivers/input/fingerprint/fpc_tee/fpc1020_tee.c
+index af457221f..79684b15d 100644
+--- a/drivers/input/fingerprint/fpc_tee/fpc1020_tee.c
++++ b/drivers/input/fingerprint/fpc_tee/fpc1020_tee.c
+@@ -114,7 +114,6 @@ struct fpc1020_data {
+ 	struct notifier_block fb_notifier;
+ 	bool fb_black;
+ 	bool wait_finger_down;
+-	struct work_struct work;
+ };
+ 
+ static irqreturn_t fpc1020_irq_handler(int irq, void *handle);
+@@ -620,12 +619,6 @@ static const struct attribute_group attribute_group = {
+ 	.attrs = attributes,
+ };
+ 
+-static void notification_work(struct work_struct *work)
+-{
+-	pr_debug("%s: unblank\n", __func__);
+-	dsi_bridge_interface_enable(FP_UNLOCK_REJECTION_TIMEOUT);
+-}
+-
+ static irqreturn_t fpc1020_irq_handler(int irq, void *handle)
+ {
+ 	struct fpc1020_data *fpc1020 = handle;
+@@ -641,7 +634,6 @@ static irqreturn_t fpc1020_irq_handler(int irq, void *handle)
+ 	    fpc1020->prepared) {
+ 		pr_debug("%s enter\n", __func__);
+ 		fpc1020->wait_finger_down = false;
+-		schedule_work(&fpc1020->work);
+ 	}
+ 
+ 	return IRQ_HANDLED;
+@@ -798,7 +790,6 @@ static int fpc1020_probe(struct platform_device *pdev)
+ 
+ 	fpc1020->fb_black = false;
+ 	fpc1020->wait_finger_down = false;
+-	INIT_WORK(&fpc1020->work, notification_work);
+ 	fpc1020->fb_notifier = fpc_notif_block;
+ 	msm_drm_register_client(&fpc1020->fb_notifier);
+ 
+diff --git a/drivers/input/fingerprint/goodix_ta/gf_spi.c b/drivers/input/fingerprint/goodix_ta/gf_spi.c
+index 63986a6f3..7e2a64b9f 100644
+--- a/drivers/input/fingerprint/goodix_ta/gf_spi.c
++++ b/drivers/input/fingerprint/goodix_ta/gf_spi.c
+@@ -544,14 +544,6 @@ static long gf_compat_ioctl(struct file *filp, unsigned int cmd,
+ }
+ #endif /*CONFIG_COMPAT*/
+ 
+-#ifndef GOODIX_DRM_INTERFACE_WA
+-static void notification_work(struct work_struct *work)
+-{
+-	pr_debug("%s unblank\n", __func__);
+-	dsi_bridge_interface_enable(FP_UNLOCK_REJECTION_TIMEOUT);
+-}
+-#endif
+-
+ static irqreturn_t gf_irq(int irq, void *handle)
+ {
+ 	struct gf_dev *gf_dev = &gf;
+@@ -571,7 +563,6 @@ static irqreturn_t gf_irq(int irq, void *handle)
+ 		input_report_key(gf_dev->input, key_input, 0);
+ 		input_sync(gf_dev->input);
+ 		gf_dev->wait_finger_down = false;
+-		schedule_work(&gf_dev->work);
+ 	}
+ 
+ #elif defined(GF_FASYNC)
+@@ -845,9 +836,6 @@ static int gf_probe(struct platform_device *pdev)
+ 	gf_dev->device_available = 0;
+ 	gf_dev->fb_black = 0;
+ 	gf_dev->wait_finger_down = false;
+-#ifndef GOODIX_DRM_INTERFACE_WA
+-	INIT_WORK(&gf_dev->work, notification_work);
+-#endif
+ 
+ 	if (gf_parse_dts(gf_dev)) {
+ 		goto error_hw;
+diff --git a/drivers/input/fingerprint/goodix_ta/gf_spi.h b/drivers/input/fingerprint/goodix_ta/gf_spi.h
+index 3ea8a55b4..dde103b34 100644
+--- a/drivers/input/fingerprint/goodix_ta/gf_spi.h
++++ b/drivers/input/fingerprint/goodix_ta/gf_spi.h
+@@ -139,7 +139,6 @@ struct gf_dev {
+ 	char device_available;
+ 	char fb_black;
+ 	char wait_finger_down;
+-	struct work_struct work;
+ #ifdef CONFIG_FINGERPRINT_FP_VREG_CONTROL
+ 	struct regulator *vreg;
+ #endif
+-- 
+2.52.0
+

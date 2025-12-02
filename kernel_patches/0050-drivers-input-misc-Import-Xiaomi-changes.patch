@@ -1,0 +1,29 @@
+From 7624806bab44ecd70187b45215b911b88b455ec3 Mon Sep 17 00:00:00 2001
+From: Sebastiano Barezzi <barezzisebastiano@gmail.com>
+Date: Wed, 22 Jun 2022 18:03:45 +0200
+Subject: [PATCH 050/115] drivers: input: misc: Import Xiaomi changes
+
+Change-Id: I9335d252b98c4e552cc04118a2cf59ec64a9f922
+---
+ drivers/input/misc/qti-haptics.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/drivers/input/misc/qti-haptics.c b/drivers/input/misc/qti-haptics.c
+index fe2ed1446..1eec6ae72 100644
+--- a/drivers/input/misc/qti-haptics.c
++++ b/drivers/input/misc/qti-haptics.c
+@@ -1176,7 +1176,11 @@ static int qti_haptics_hw_init(struct qti_hap_chip *chip)
+ 	addr = REG_HAP_AUTO_RES_CFG;
+ 	mask = HAP_AUTO_RES_MODE_BIT | HAP_CAL_EOP_EN_BIT | HAP_CAL_PERIOD_MASK;
+ 	val = config->lra_auto_res_mode << HAP_AUTO_RES_MODE_SHIFT;
++#ifdef CONFIG_MACH_XIAOMI_SM8150
++	val |= HAP_CAL_EOP_EN_BIT;
++#else
+ 	val |= HAP_CAL_EOP_EN_BIT | HAP_CAL_OPT3_EVERY_8_PERIOD;
++#endif
+ 	rc = qti_haptics_masked_write(chip, addr, mask, val);
+ 	if (rc < 0) {
+ 		dev_err(chip->dev, "set AUTO_RES_CFG failed, rc=%d\n", rc);
+-- 
+2.52.0
+

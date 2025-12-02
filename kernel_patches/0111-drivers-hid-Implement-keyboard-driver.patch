@@ -1,0 +1,439 @@
+From f30dc4d15cbde0b98d8dc6c1f9f6c7cbf1abff82 Mon Sep 17 00:00:00 2001
+From: Sebastiano Barezzi <seba@sebaubuntu.dev>
+Date: Sat, 3 Aug 2024 02:10:13 +0200
+Subject: [PATCH 111/115] drivers: hid: Implement keyboard driver
+
+Will remove the keyboard from the input when disconnected
+
+Change-Id: Ide873402a0ebc1b4844f6c4e6666c03fff3f5ba4
+---
+ drivers/hid/Makefile                          |   2 +
+ drivers/hid/hid-core.c                        |   3 +
+ drivers/hid/hid-ids.h                         |   2 +
+ drivers/hid/hid-xiaomi.c                      | 215 ++++++++++++++++++
+ .../misc/xiaomi_keyboard/xiaomi_keyboard.c    |  95 +++++++-
+ .../misc/xiaomi_keyboard/xiaomi_keyboard.h    |   2 +
+ include/linux/input/usbkbd-xiaomi.h           |  15 ++
+ 7 files changed, 330 insertions(+), 4 deletions(-)
+ create mode 100644 drivers/hid/hid-xiaomi.c
+ create mode 100644 include/linux/input/usbkbd-xiaomi.h
+
+diff --git a/drivers/hid/Makefile b/drivers/hid/Makefile
+index 94b39817f..351176547 100644
+--- a/drivers/hid/Makefile
++++ b/drivers/hid/Makefile
+@@ -118,6 +118,8 @@ obj-$(CONFIG_HID_WIIMOTE)	+= hid-wiimote.o
+ obj-$(CONFIG_HID_SENSOR_HUB)	+= hid-sensor-hub.o
+ obj-$(CONFIG_HID_SENSOR_CUSTOM_SENSOR)	+= hid-sensor-custom.o
+ 
++obj-$(CONFIG_XIAOMI_KEYBOARD)	+= hid-xiaomi.o
++
+ obj-$(CONFIG_USB_HID)		+= usbhid/
+ obj-$(CONFIG_USB_MOUSE)		+= usbhid/
+ obj-$(CONFIG_USB_KBD)		+= usbhid/
+diff --git a/drivers/hid/hid-core.c b/drivers/hid/hid-core.c
+index 0e5db253d..fc107ba4e 100644
+--- a/drivers/hid/hid-core.c
++++ b/drivers/hid/hid-core.c
+@@ -2510,6 +2510,9 @@ static const struct hid_device_id hid_have_special_driver[] = {
+ #endif
+ #if IS_ENABLED(CONFIG_HID_ZYDACRON)
+ 	{ HID_USB_DEVICE(USB_VENDOR_ID_ZYDACRON, USB_DEVICE_ID_ZYDACRON_REMOTE_CONTROL) },
++#endif
++#if IS_ENABLED(CONFIG_XIAOMI_KEYBOARD)
++	{ HID_USB_DEVICE(USB_VENDOR_ID_NANO_IC, 0x3FFC) },
+ #endif
+ 	{ }
+ };
+diff --git a/drivers/hid/hid-ids.h b/drivers/hid/hid-ids.h
+index cbd40d59b..f6bf0b497 100644
+--- a/drivers/hid/hid-ids.h
++++ b/drivers/hid/hid-ids.h
+@@ -1160,6 +1160,8 @@
+ #define USB_VENDOR_ID_XAT	0x2505
+ #define USB_DEVICE_ID_XAT_CSR	0x0220
+ 
++#define USB_VENDOR_ID_NANO_IC	0x3206
++
+ #define USB_VENDOR_ID_XIN_MO			0x16c0
+ #define USB_DEVICE_ID_XIN_MO_DUAL_ARCADE	0x05e1
+ #define USB_DEVICE_ID_THT_2P_ARCADE		0x75e1
+diff --git a/drivers/hid/hid-xiaomi.c b/drivers/hid/hid-xiaomi.c
+new file mode 100644
+index 000000000..c6a8d256b
+--- /dev/null
++++ b/drivers/hid/hid-xiaomi.c
+@@ -0,0 +1,215 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++/*
++ *  HID driver for the Xiaomi Mi Pad 5 keyboard.
++ *
++ *  Copyright (c) 2024 Sebastiano Barezzi <seba@sebaubuntu.dev>
++ */
++
++/**
++ * This driver is needed to support the Xiaomi Mi Pad 5 keyboard due to their engineering mess.
++ * The keyboard controller is in the tablet, and the keyboard connects through pogo pins.
++ * The controllers appears as a USB HID device, but without being aware of its presence.
++ * The driver, thanks to the original Xiaomi driver needed for power juice, will add and remove the
++ * Linux input device when the keyboard is connected and disconnected.
++ */
++
++#include <linux/hid.h>
++#include <linux/input.h>
++#include <linux/list.h>
++#include <linux/module.h>
++#include <linux/usb.h>
++#include <linux/types.h>
++#include <linux/workqueue.h>
++
++#include "hid-ids.h"
++
++/**
++ * Wait interval for the connection check to let the IRQ handler to settle down.
++ */
++#define CONNECTION_WAIT_INTERVAL 1000 /* msec */
++
++struct xiaomi_priv {
++	struct list_head list;
++
++	struct hid_device *hdev;
++
++	bool enabled;
++	struct mutex enabled_lock;
++
++	struct workqueue_struct *connection_wq;
++	struct delayed_work connection_work;
++};
++
++// List of all instances
++static struct list_head instances = LIST_HEAD_INIT(instances);
++static DEFINE_MUTEX(instances_lock);
++
++// Keyboard connection status, true by default
++static bool connected = true;
++
++// Called by vendor driver
++void xiaomi_keyboard_connection_change(bool _connected)
++{
++	struct xiaomi_priv *instance;
++
++	connected = _connected;
++
++	mutex_lock(&instances_lock);
++	list_for_each_entry(instance, &instances, list) {
++		// Schedule the work, wait a sec before toggling the keyboard
++		mod_delayed_work(instance->connection_wq,
++				 &instance->connection_work,
++				 msecs_to_jiffies(CONNECTION_WAIT_INTERVAL));
++	}
++	mutex_unlock(&instances_lock);
++}
++
++/**
++ * Updates the HID device status in a safe way.
++ * Needed to avoid a double-free in the HID core.
++ */
++static int xiaomi_safe_toggle(struct hid_device *hdev, bool enable)
++{
++	struct xiaomi_priv *priv = hid_get_drvdata(hdev);
++	int ret = 0;
++
++	mutex_lock(&priv->enabled_lock);
++
++	if (priv->enabled == enable) {
++		goto done;
++	}
++
++	if (enable) {
++		ret = hid_hw_start(hdev, HID_CONNECT_DEFAULT);
++		if (ret) {
++			hid_err(hdev, "hid_hw_start failed\n");
++			goto done;
++		}
++	} else {
++		hid_hw_stop(hdev);
++	}
++
++	priv->enabled = enable;
++
++done:
++	mutex_unlock(&priv->enabled_lock);
++
++	return ret;
++}
++
++static void xiaomi_connection_work(struct work_struct *work)
++{
++	struct xiaomi_priv *priv = container_of(
++		to_delayed_work(work), struct xiaomi_priv, connection_work);
++	struct hid_device *hdev = priv->hdev;
++
++	xiaomi_safe_toggle(hdev, connected);
++}
++
++static int xiaomi_probe(struct hid_device *hdev, const struct hid_device_id *id)
++{
++	struct xiaomi_priv *priv;
++	int ret;
++
++	if (!hid_is_usb(hdev)) {
++		ret = -EINVAL;
++		goto err_1;
++	}
++
++	priv = kzalloc(sizeof(*priv), GFP_KERNEL);
++	if (!priv) {
++		ret = -ENOMEM;
++		goto err_1;
++	}
++
++	// Setup workqueue
++	priv->connection_wq = create_singlethread_workqueue("hid-xiaomi");
++	if (!priv->connection_wq) {
++		ret = -ENOMEM;
++		goto err_2;
++	}
++	INIT_DELAYED_WORK(&priv->connection_work, xiaomi_connection_work);
++
++	priv->hdev = hdev;
++	priv->enabled = false;
++
++	// Setup the mutex
++	mutex_init(&priv->enabled_lock);
++
++	hid_set_drvdata(hdev, priv);
++
++	ret = hid_parse(hdev);
++	if (ret) {
++		hid_err(hdev, "hid_parse failed\n");
++		goto err_3;
++	}
++
++	ret = xiaomi_safe_toggle(hdev, true);
++	if (ret) {
++		hid_err(hdev, "hid_hw_start failed\n");
++		goto err_3;
++	}
++
++	// Schedule an update to keep the keyboard in sync
++	mod_delayed_work(priv->connection_wq, &priv->connection_work,
++			 msecs_to_jiffies(CONNECTION_WAIT_INTERVAL));
++
++	// Add the instance to the list
++	mutex_lock(&instances_lock);
++	list_add(&priv->list, &instances);
++	mutex_unlock(&instances_lock);
++
++	return 0;
++
++err_3:
++	mutex_destroy(&priv->enabled_lock);
++	destroy_workqueue(priv->connection_wq);
++err_2:
++	kfree(priv);
++err_1:
++	return ret;
++}
++
++static void xiaomi_remove(struct hid_device *hdev)
++{
++	struct xiaomi_priv *priv = hid_get_drvdata(hdev);
++
++	// Remove the instance from the list
++	mutex_lock(&instances_lock);
++	list_del(&priv->list);
++	mutex_unlock(&instances_lock);
++
++	// Wait for the work to finish
++	cancel_delayed_work_sync(&priv->connection_work);
++
++	// Stop the HID device
++	xiaomi_safe_toggle(hdev, false);
++
++	// Destroy the mutex
++	mutex_destroy(&priv->enabled_lock);
++
++	// Destroy the workqueue
++	destroy_workqueue(priv->connection_wq);
++
++	kfree(priv);
++}
++
++static const struct hid_device_id xiaomi_devices[] = {
++	{
++		HID_USB_DEVICE(USB_VENDOR_ID_NANO_IC, 0x3FFC),
++	},
++	{}
++};
++MODULE_DEVICE_TABLE(hid, xiaomi_devices);
++
++static struct hid_driver hid_xiaomi = {
++	.name = "hid-xiaomi",
++	.id_table = xiaomi_devices,
++	.probe = xiaomi_probe,
++	.remove = xiaomi_remove,
++};
++module_hid_driver(hid_xiaomi);
++
++MODULE_AUTHOR("Sebastiano Barezzi <seba@sebaubuntu.dev>");
++MODULE_DESCRIPTION("Xiaomi Mi Pad 5 keyboard HID driver");
++MODULE_LICENSE("GPL");
+diff --git a/drivers/input/misc/xiaomi_keyboard/xiaomi_keyboard.c b/drivers/input/misc/xiaomi_keyboard/xiaomi_keyboard.c
+index 98d41b8ea..8e91dc92f 100644
+--- a/drivers/input/misc/xiaomi_keyboard/xiaomi_keyboard.c
++++ b/drivers/input/misc/xiaomi_keyboard/xiaomi_keyboard.c
+@@ -15,6 +15,7 @@
+ #include "xiaomi_keyboard.h"
+ #include <linux/msm_drm_notify.h>
+ #include <linux/notifier.h>
++#include <linux/input/usbkbd-xiaomi.h>
+ 
+ static struct xiaomi_keyboard_data *mdata;
+ 
+@@ -92,6 +93,91 @@ DEVICE_ATTR(xiaomi_keyboard_conn_status, (S_IRUGO | S_IWUSR | S_IWGRP),
+ 	    xiaomi_keyboard_conn_status_show,
+ 	    xiaomi_keyboard_conn_status_store);
+ 
++static ssize_t xiaomi_keyboard_connected_show(struct device *dev,
++					      struct device_attribute *attr,
++					      char *buf)
++{
++	if (!mdata)
++		return -EINVAL;
++
++	return scnprintf(buf, PAGE_SIZE, "%d", mdata->connected);
++}
++
++static ssize_t xiaomi_keyboard_connected_store(struct device *dev,
++					       struct device_attribute *attr,
++					       const char *buf, size_t count)
++{
++	int rc, val;
++
++	rc = kstrtoint(buf, 10, &val);
++	if (rc)
++		return -EINVAL;
++
++	if (!mdata)
++		return -EINVAL;
++
++	mdata->connected = !!val;
++
++	sysfs_notify(&mdata->pdev->dev.kobj, NULL, "xiaomi_keyboard_connected");
++
++	// Notify the input driver
++	xiaomi_keyboard_connection_change(
++		!!(mdata->connected && mdata->user_enabled));
++
++	return count;
++}
++
++DEVICE_ATTR(xiaomi_keyboard_connected, (S_IRUGO | S_IWUSR | S_IWGRP),
++	    xiaomi_keyboard_connected_show, xiaomi_keyboard_connected_store);
++
++static ssize_t xiaomi_keyboard_enabled_show(struct device *dev,
++					    struct device_attribute *attr,
++					    char *buf)
++{
++	if (!mdata)
++		return -EINVAL;
++
++	return scnprintf(buf, PAGE_SIZE, "%d", mdata->user_enabled);
++}
++
++static ssize_t xiaomi_keyboard_enabled_store(struct device *dev,
++					     struct device_attribute *attr,
++					     const char *buf, size_t count)
++{
++	int rc, val;
++
++	rc = kstrtoint(buf, 10, &val);
++	if (rc)
++		return -EINVAL;
++
++	if (!mdata)
++		return -EINVAL;
++
++	mdata->user_enabled = !!val;
++
++	sysfs_notify(&mdata->pdev->dev.kobj, NULL, "xiaomi_keyboard_enabled");
++
++	// Notify the input driver
++	xiaomi_keyboard_connection_change(
++		!!(mdata->connected && mdata->user_enabled));
++
++	return count;
++}
++
++DEVICE_ATTR(xiaomi_keyboard_enabled, (S_IRUGO | S_IWUSR | S_IWGRP),
++	    xiaomi_keyboard_enabled_show, xiaomi_keyboard_enabled_store);
++
++static struct attribute *sysfs_attrs[] = {
++	&dev_attr_xiaomi_keyboard_conn_status.attr,
++	&dev_attr_xiaomi_keyboard_connected.attr,
++	&dev_attr_xiaomi_keyboard_enabled.attr,
++	NULL,
++};
++
++static const struct attribute_group xiaomi_attribute_group = {
++	.attrs = sysfs_attrs,
++};
++
+ static irqreturn_t xiaomi_keyboard_irq_func(int irq, void *data)
+ {
+ 	int value = 0;
+@@ -533,12 +619,13 @@ static int xiaomi_keyboard_probe(struct platform_device *pdev)
+ 	mdata->dev_pm_suspend = false;
+ 	mdata->keyboard_is_enable = false;
+ 	mdata->is_in_suspend = false;
++	mdata->connected = true;
++	mdata->user_enabled = true;
+ 
+-	ret = sysfs_create_file(&mdata->pdev->dev.kobj,
+-				&dev_attr_xiaomi_keyboard_conn_status.attr);
++	ret = sysfs_create_group(&mdata->pdev->dev.kobj,
++				 &xiaomi_attribute_group);
+ 	if (ret < 0) {
+-		MI_KB_ERR(
+-			"Create sysfs attribute xiaomi_keyboard_conn_status Failed\n");
++		MI_KB_ERR("Create sysfs group Failed\n");
+ 		goto err_pinctrl_select;
+ 	}
+ 
+diff --git a/drivers/input/misc/xiaomi_keyboard/xiaomi_keyboard.h b/drivers/input/misc/xiaomi_keyboard/xiaomi_keyboard.h
+index 32bb8c0dc..914b094b8 100644
+--- a/drivers/input/misc/xiaomi_keyboard/xiaomi_keyboard.h
++++ b/drivers/input/misc/xiaomi_keyboard/xiaomi_keyboard.h
+@@ -43,5 +43,7 @@ struct xiaomi_keyboard_data {
+ 	int is_usb_exist;
+ 	bool keyboard_is_enable;
+ 	bool is_in_suspend;
++	bool connected;
++	bool user_enabled;
+ };
+ #endif
+diff --git a/include/linux/input/usbkbd-xiaomi.h b/include/linux/input/usbkbd-xiaomi.h
+new file mode 100644
+index 000000000..7af82a271
+--- /dev/null
++++ b/include/linux/input/usbkbd-xiaomi.h
+@@ -0,0 +1,15 @@
++/*
++ * Copyright (c) 2024 Sebastiano Barezzi <seba@sebaubuntu.dev>
++ *
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms of the GNU General Public License version 2 as published by
++ * the Free Software Foundation.
++ */
++
++#include <linux/types.h>
++
++#ifdef CONFIG_XIAOMI_KEYBOARD
++void xiaomi_keyboard_connection_change(bool connected);
++#else
++static inline void xiaomi_keyboard_connection_change(bool connected) { }
++#endif
+-- 
+2.52.0
+

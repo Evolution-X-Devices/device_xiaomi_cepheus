@@ -1,0 +1,41 @@
+From 9658be3f44ca53be8034eac57d7eb9024e0518e7 Mon Sep 17 00:00:00 2001
+From: Yumi Yukimura <me.cafebabe@gmail.com>
+Date: Thu, 8 Feb 2024 15:22:30 +0800
+Subject: [PATCH 062/115] drivers: input: touchscreen: xiaomi: fts_521: Fix
+ sscanf() buffer overflow
+
+Change-Id: I20dcdc3e0242ae61b0bce256575c3c9bc315f810
+---
+ drivers/input/touchscreen/xiaomi/fts_521/fts.c      | 2 +-
+ drivers/input/touchscreen/xiaomi/fts_521/fts_proc.c | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/input/touchscreen/xiaomi/fts_521/fts.c b/drivers/input/touchscreen/xiaomi/fts_521/fts.c
+index c1d3da688..421d31f59 100644
+--- a/drivers/input/touchscreen/xiaomi/fts_521/fts.c
++++ b/drivers/input/touchscreen/xiaomi/fts_521/fts.c
+@@ -225,7 +225,7 @@ static ssize_t fts_fwupdate_store(struct device *dev,
+ 	mode[1] = 1;
+ 
+ 	/* reading out firmware upgrade parameters */
+-	sscanf(buf, "%100s %d %d", path, &mode[0], &mode[1]);
++	sscanf(buf, "%99s %d %d", path, &mode[0], &mode[1]);
+ 	logError(1, "%s fts_fwupdate_store: mode = %s \n", tag, path);
+ 
+ 	ret = flashProcedure(path, mode[0], mode[1]);
+diff --git a/drivers/input/touchscreen/xiaomi/fts_521/fts_proc.c b/drivers/input/touchscreen/xiaomi/fts_521/fts_proc.c
+index 2b1b5fa8d..5ce24e9f5 100644
+--- a/drivers/input/touchscreen/xiaomi/fts_521/fts_proc.c
++++ b/drivers/input/touchscreen/xiaomi/fts_521/fts_proc.c
+@@ -466,7 +466,7 @@ static ssize_t fts_driver_test_write(struct file *file, const char __user *buf,
+ 		case CMD_GETLIMITSFILE:
+ 			if (count - 2 - 1 > 1) {
+ 				numberParam = 2;
+-				sscanf(p, "%100s", path);
++				sscanf(p, "%99s", path);
+ 			}
+ 			break;
+ 
+-- 
+2.52.0
+

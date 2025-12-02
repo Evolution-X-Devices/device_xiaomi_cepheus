@@ -1,0 +1,21 @@
+From 16d2b479c36ca157b6823a31bc7c37df4f4ac227 Mon Sep 17 00:00:00 2001
+From: Davide Garberi <dade.garberi@gmail.com>
+Date: Sat, 29 Feb 2020 11:15:26 +0100
+Subject: [PATCH 003/115] arch: arm64: configs: xiaomi: Enable
+ CONFIG_BUILD_ARM64_DT_OVERLAY
+
+Change-Id: I25959ef7eec025a5506cb6de863c09555a1dd4ce
+---
+ arch/arm64/configs/vendor/xiaomi/sm8150-common.config | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/arch/arm64/configs/vendor/xiaomi/sm8150-common.config b/arch/arm64/configs/vendor/xiaomi/sm8150-common.config
+index e69de29bb..420bd53fe 100644
+--- a/arch/arm64/configs/vendor/xiaomi/sm8150-common.config
++++ b/arch/arm64/configs/vendor/xiaomi/sm8150-common.config
+@@ -0,0 +1,2 @@
++# DTBO
++CONFIG_BUILD_ARM64_DT_OVERLAY=y
+-- 
+2.52.0
+

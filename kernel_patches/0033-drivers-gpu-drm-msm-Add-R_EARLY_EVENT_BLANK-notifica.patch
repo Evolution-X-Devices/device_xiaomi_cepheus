@@ -1,0 +1,52 @@
+From 7746b1d3b4b6b744644c72ee92b6f84bdf959fba Mon Sep 17 00:00:00 2001
+From: Sebastiano Barezzi <seba@sebaubuntu.dev>
+Date: Tue, 16 Apr 2024 01:45:41 +0200
+Subject: [PATCH 033/115] drivers: gpu: drm: msm: Add R_EARLY_EVENT_BLANK
+ notification
+
+Change-Id: I229a619f169dec96834ba3412e853f8bdc03b7fa
+---
+ drivers/gpu/drm/msm/dsi-staging/dsi_drm.c | 8 ++++++++
+ include/linux/msm_drm_notify.h            | 2 ++
+ 2 files changed, 10 insertions(+)
+
+diff --git a/drivers/gpu/drm/msm/dsi-staging/dsi_drm.c b/drivers/gpu/drm/msm/dsi-staging/dsi_drm.c
+index e659930e6..0a9612a2c 100644
+--- a/drivers/gpu/drm/msm/dsi-staging/dsi_drm.c
++++ b/drivers/gpu/drm/msm/dsi-staging/dsi_drm.c
+@@ -275,11 +275,19 @@ static void dsi_bridge_disable(struct drm_bridge *bridge)
+ 	struct dsi_display *display;
+ 	struct dsi_bridge *c_bridge = to_dsi_bridge(bridge);
+ 	int private_flags;
++	struct msm_drm_notifier notify_data;
++	int power_mode;
+ 
+ 	if (!bridge) {
+ 		pr_err("Invalid params\n");
+ 		return;
+ 	}
++
++	power_mode = sde_connector_get_lp(c_bridge->display->drm_conn);
++	notify_data.data = &power_mode;
++	notify_data.id = MSM_DRM_PRIMARY_DISPLAY;
++	msm_drm_notifier_call_chain(MSM_DRM_R_EARLY_EVENT_BLANK, &notify_data);
++
+ 	display = c_bridge->display;
+ 
+ 	private_flags =
+diff --git a/include/linux/msm_drm_notify.h b/include/linux/msm_drm_notify.h
+index 4f9b32662..ab04119ed 100644
+--- a/include/linux/msm_drm_notify.h
++++ b/include/linux/msm_drm_notify.h
+@@ -19,6 +19,8 @@
+ #define MSM_DRM_EVENT_BLANK			0x01
+ /* A hardware display blank early change occurred */
+ #define MSM_DRM_EARLY_EVENT_BLANK		0x02
++/* A hardware display blank early change occurred */
++#define MSM_DRM_R_EARLY_EVENT_BLANK		0x03
+ 
+ enum {
+ 	/* panel: power on */
+-- 
+2.52.0
+

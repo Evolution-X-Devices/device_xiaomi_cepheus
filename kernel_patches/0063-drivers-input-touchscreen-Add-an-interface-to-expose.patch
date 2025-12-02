@@ -1,0 +1,100 @@
+From be93b744a07f402c59a2021ed759fd973bead5b0 Mon Sep 17 00:00:00 2001
+From: dianlujitao <dianlujitao@lineageos.org>
+Date: Wed, 19 Feb 2020 16:48:25 +0800
+Subject: [PATCH 063/115] drivers: input: touchscreen: Add an interface to
+ expose TP features to userspace
+
+* Needs to implement and register ops from TP driver
+ * Access them via /sys/touchpanel/*
+
+Change-Id: I2baa61c6055ca6f6207ac0d6f627fe03048ccfb6
+---
+ drivers/input/touchscreen/Kconfig     |  9 +++++++++
+ drivers/input/touchscreen/Makefile    |  1 +
+ drivers/input/touchscreen/tp_common.c | 26 ++++++++++++++++++++++++++
+ include/linux/input/tp_common.h       | 13 +++++++++++++
+ 4 files changed, 49 insertions(+)
+ create mode 100644 drivers/input/touchscreen/tp_common.c
+ create mode 100644 include/linux/input/tp_common.h
+
+diff --git a/drivers/input/touchscreen/Kconfig b/drivers/input/touchscreen/Kconfig
+index 7f85cd5de..580d995e3 100644
+--- a/drivers/input/touchscreen/Kconfig
++++ b/drivers/input/touchscreen/Kconfig
+@@ -1300,4 +1300,13 @@ source "drivers/input/touchscreen/focaltech_touch/Kconfig"
+ 
+ source "drivers/input/touchscreen/xiaomi/Kconfig"
+ 
++config TOUCHSCREEN_COMMON
++	bool "Common touchscreen interface to interact with userspace"
++	default y
++	help
++	  Say Y here if you want to control touchpanel features via
++	  /sys/touchpanel.
++
++	  If unsure, say N.
++
+ endif
+diff --git a/drivers/input/touchscreen/Makefile b/drivers/input/touchscreen/Makefile
+index 17aa95412..86bc6541e 100644
+--- a/drivers/input/touchscreen/Makefile
++++ b/drivers/input/touchscreen/Makefile
+@@ -113,3 +113,4 @@ obj-$(CONFIG_TOUCHSCREEN_IQS5XX)	+= iqs5xx.o
+ obj-$(CONFIG_TOUCHSCREEN_ST)	+= st/
+ obj-$(CONFIG_TOUCHSCREEN_FTS)	+= focaltech_touch/
+ obj-y += xiaomi/
++obj-$(CONFIG_TOUCHSCREEN_COMMON)	+= tp_common.o
+diff --git a/drivers/input/touchscreen/tp_common.c b/drivers/input/touchscreen/tp_common.c
+new file mode 100644
+index 000000000..d3a549845
+--- /dev/null
++++ b/drivers/input/touchscreen/tp_common.c
+@@ -0,0 +1,26 @@
++#include <linux/input/tp_common.h>
++
++struct kobject *touchpanel_kobj;
++
++#define TS_ENABLE_FOPS(type)                                                   \
++	int tp_common_set_##type##_ops(struct tp_common_ops *ops)              \
++	{                                                                      \
++		static struct kobj_attribute kattr =                           \
++			__ATTR(type, (S_IWUSR | S_IRUGO), NULL, NULL);         \
++		kattr.show = ops->show;                                        \
++		kattr.store = ops->store;                                      \
++		return sysfs_create_file(touchpanel_kobj, &kattr.attr);        \
++	}
++
++TS_ENABLE_FOPS(double_tap)
++TS_ENABLE_FOPS(fod_status)
++
++static int __init tp_common_init(void)
++{
++	touchpanel_kobj = kobject_create_and_add("touchpanel", NULL);
++	if (!touchpanel_kobj)
++		return -ENOMEM;
++
++	return 0;
++}
++core_initcall(tp_common_init);
+diff --git a/include/linux/input/tp_common.h b/include/linux/input/tp_common.h
+new file mode 100644
+index 000000000..0428a046f
+--- /dev/null
++++ b/include/linux/input/tp_common.h
+@@ -0,0 +1,13 @@
++#include <linux/kobject.h>
++
++extern struct kobject *touchpanel_kobj;
++
++struct tp_common_ops {
++	ssize_t (*show)(struct kobject *kobj, struct kobj_attribute *attr,
++			char *buf);
++	ssize_t (*store)(struct kobject *kobj, struct kobj_attribute *attr,
++			 const char *buf, size_t count);
++};
++
++int tp_common_set_double_tap_ops(struct tp_common_ops *ops);
++int tp_common_set_fod_status_ops(struct tp_common_ops *ops);
+-- 
+2.52.0
+

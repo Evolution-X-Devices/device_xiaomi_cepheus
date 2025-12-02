@@ -1,0 +1,135 @@
+From 5eb0d548bc1d420314f49a5b0d5cf1f907f3d997 Mon Sep 17 00:00:00 2001
+From: Sebastiano Barezzi <seba@sebaubuntu.dev>
+Date: Mon, 6 Nov 2023 19:38:05 +0100
+Subject: [PATCH 048/115] drivers: input: fingerprint: goodix: Add vayu support
+
+* From vayu-r-oss
+
+Change-Id: I1507b413477a80c8ca36a702499c7aeb4b7d51c2
+---
+ drivers/input/fingerprint/goodix_ta/gf_spi.c | 44 ++++++++++++++------
+ drivers/input/fingerprint/goodix_ta/gf_spi.h |  4 +-
+ 2 files changed, 33 insertions(+), 15 deletions(-)
+
+diff --git a/drivers/input/fingerprint/goodix_ta/gf_spi.c b/drivers/input/fingerprint/goodix_ta/gf_spi.c
+index 7ade4a784..0d457eb7e 100644
+--- a/drivers/input/fingerprint/goodix_ta/gf_spi.c
++++ b/drivers/input/fingerprint/goodix_ta/gf_spi.c
+@@ -49,6 +49,7 @@
+ #ifndef GOODIX_DRM_INTERFACE_WA
+ #include <linux/msm_drm_notify.h>
+ #endif
++#include <soc/qcom/socinfo.h>
+ 
+ #include "gf_spi.h"
+ 
+@@ -591,9 +592,11 @@ static int gf_open(struct inode *inode, struct file *filp)
+ 			break;
+ 		}
+ 	}
+-#ifdef CONFIG_FINGERPRINT_FP_VREG_CONTROL
+ 	pr_info("Try to enable fp_vdd_vreg\n");
+-	gf_dev->vreg = regulator_get(&gf_dev->spi->dev, "fp_vdd_vreg");
++	if (get_hw_version_platform() == HARDWARE_PLATFORM_VAYU)
++		gf_dev->vreg = regulator_get(NULL, "pm8150_l17");
++	else
++		gf_dev->vreg = regulator_get(&gf_dev->spi->dev, "fp_vdd_vreg");
+ 
+ 	if (gf_dev->vreg == NULL) {
+ 		dev_err(&gf_dev->spi->dev,
+@@ -605,6 +608,17 @@ static int gf_open(struct inode *inode, struct file *filp)
+ 	if (regulator_is_enabled(gf_dev->vreg)) {
+ 		pr_info("fp_vdd_vreg is already enabled!\n");
+ 	} else {
++		if (get_hw_version_platform() == HARDWARE_PLATFORM_VAYU) {
++			status = regulator_set_voltage(gf_dev->vreg, 3000000,
++						       3000000);
++			if (status < 0) {
++				pr_info("fp_vdd_vreg set voltage failed!\n");
++				gf_dev->vreg = NULL;
++				mutex_unlock(&device_list_lock);
++				return -EPERM;
++			}
++		}
++
+ 		rc = regulator_enable(gf_dev->vreg);
+ 
+ 		if (rc) {
+@@ -618,10 +632,12 @@ static int gf_open(struct inode *inode, struct file *filp)
+ 	}
+ 
+ 	pr_info("fp_vdd_vreg is enabled!\n");
+-#endif
+ 
+ 	if (status == 0) {
+-		rc = gpio_request(gf_dev->reset_gpio, "goodix_reset");
++		if (get_hw_version_platform() == HARDWARE_PLATFORM_VAYU)
++			rc = gpio_request(gf_dev->reset_gpio, "gpio-reset");
++		else
++			rc = gpio_request(gf_dev->reset_gpio, "goodix_reset");
+ 
+ 		if (rc) {
+ 			dev_err(&gf_dev->spi->dev,
+@@ -632,7 +648,10 @@ static int gf_open(struct inode *inode, struct file *filp)
+ 		}
+ 
+ 		gpio_direction_output(gf_dev->reset_gpio, 0);
+-		rc = gpio_request(gf_dev->irq_gpio, "goodix_irq");
++		if (get_hw_version_platform() == HARDWARE_PLATFORM_VAYU)
++			rc = gpio_request(gf_dev->irq_gpio, "gpio-irq");
++		else
++			rc = gpio_request(gf_dev->irq_gpio, "goodix_irq");
+ 
+ 		if (rc) {
+ 			dev_err(&gf_dev->spi->dev,
+@@ -696,16 +715,15 @@ static int gf_release(struct inode *inode, struct file *filp)
+ 	/*
+ 	 *Disable fp_vdd_vreg regulator
+ 	 */
+-#ifdef CONFIG_FINGERPRINT_FP_VREG_CONTROL
+-	pr_info("disable fp_vdd_vreg!\n");
++	if (get_hw_version_platform() == HARDWARE_PLATFORM_VAYU) {
++		pr_info("disable fp_vdd_vreg!\n");
+ 
+-	if (regulator_is_enabled(gf_dev->vreg)) {
+-		regulator_disable(gf_dev->vreg);
+-		regulator_put(gf_dev->vreg);
+-		gf_dev->vreg = NULL;
++		if (regulator_is_enabled(gf_dev->vreg)) {
++			regulator_disable(gf_dev->vreg);
++			regulator_put(gf_dev->vreg);
++			gf_dev->vreg = NULL;
++		}
+ 	}
+-
+-#endif
+ 	gf_dev->users--;
+ 
+ 	if (!gf_dev->users) {
+diff --git a/drivers/input/fingerprint/goodix_ta/gf_spi.h b/drivers/input/fingerprint/goodix_ta/gf_spi.h
+index dde103b34..e9b17f8b1 100644
+--- a/drivers/input/fingerprint/goodix_ta/gf_spi.h
++++ b/drivers/input/fingerprint/goodix_ta/gf_spi.h
+@@ -105,7 +105,9 @@ struct gf_ioc_chip_info {
+ #define USE_PLATFORM_BUS 1
+ /*#define  USE_SPI_BUS  1*/
+ /*#define GF_FASYNC   1*/ /*If support fasync mechanism.*/
++#ifndef CONFIG_MACH_XIAOMI_VAYU
+ #define GF_PW_CTL 1
++#endif
+ #define GF_NETLINK_ENABLE 1
+ #define GF_NET_EVENT_IRQ 1
+ #define GF_NET_EVENT_FB_BLACK 2
+@@ -139,9 +141,7 @@ struct gf_dev {
+ 	char device_available;
+ 	char fb_black;
+ 	char wait_finger_down;
+-#ifdef CONFIG_FINGERPRINT_FP_VREG_CONTROL
+ 	struct regulator *vreg;
+-#endif
+ };
+ 
+ int gf_parse_dts(struct gf_dev *gf_dev);
+-- 
+2.52.0
+

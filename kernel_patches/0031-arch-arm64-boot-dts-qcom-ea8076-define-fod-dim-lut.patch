@@ -1,0 +1,302 @@
+From dc83aa4163280a9460a19f356c788517d03c4b58 Mon Sep 17 00:00:00 2001
+From: Demon000 <demonsingur@gmail.com>
+Date: Mon, 25 May 2020 13:11:09 +0200
+Subject: [PATCH 031/115] arch: arm64: boot: dts: qcom: ea8076: define fod dim
+ lut
+
+Change-Id: I760efba8aedc2bd52a77ca6b2c076cfdf23e11b2
+---
+ .../dsi-panel-samsung-fhd-ea8076-cmd.dtsi     | 25 +++++++++++++++++++
+ .../dsi-panel-samsung-fhd-ea8076-f1-cmd.dtsi  | 24 ++++++++++++++++++
+ ...dsi-panel-samsung-fhd-ea8076-f1mp-cmd.dtsi | 24 ++++++++++++++++++
+ ...i-panel-samsung-fhd-ea8076-f1p2-2-cmd.dtsi | 24 ++++++++++++++++++
+ ...dsi-panel-samsung-fhd-ea8076-f1p2-cmd.dtsi | 24 ++++++++++++++++++
+ .../dsi-panel-samsung-fhd-ea8076-f1s-cmd.dtsi | 24 ++++++++++++++++++
+ .../display/dsi-panel-ss-fhd-ea8076-cmd.dtsi  | 24 ++++++++++++++++++
+ .../dsi-panel-ss-fhd-ea8076-global-cmd.dtsi   | 24 ++++++++++++++++++
+ 8 files changed, 193 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/qcom/xiaomi/overlay/common/display/dsi-panel-samsung-fhd-ea8076-cmd.dtsi b/arch/arm64/boot/dts/qcom/xiaomi/overlay/common/display/dsi-panel-samsung-fhd-ea8076-cmd.dtsi
+index db08ebcd4..6978a2fdc 100644
+--- a/arch/arm64/boot/dts/qcom/xiaomi/overlay/common/display/dsi-panel-samsung-fhd-ea8076-cmd.dtsi
++++ b/arch/arm64/boot/dts/qcom/xiaomi/overlay/common/display/dsi-panel-samsung-fhd-ea8076-cmd.dtsi
+@@ -61,6 +61,31 @@
+ 		qcom,dispparam-enabled;
+ 		qcom,mdss-panel-on-dimming-delay = <120>;
+ 		qcom,disp-doze-backlight-threshold = <8>;
++		qcom,disp-fod-dim-lut = <
++			/* brightness, alpha */
++			0	0xFF
++			4	0xEB
++			8	0xEA
++			12	0xE9
++			13	0xE8
++			20	0xE5
++			24	0xE3
++			30	0xE0
++			68	0xD0
++			133	0xC0
++			218	0xB0
++			328	0xA0
++			486	0x90
++			642	0x80
++			832	0x70
++			1043	0x60
++			1267	0x50
++			1500	0x40
++			1770	0x30
++			2000	0x24
++			2047	0x21
++		>;
++		
+ 		/* IRQF_ONESHOT | IRQF_TRIGGER_FALLING */
+ 		qcom,esd-err-irq-gpio = <&tlmm 27 0x2002>;
+ 
+diff --git a/arch/arm64/boot/dts/qcom/xiaomi/overlay/common/display/dsi-panel-samsung-fhd-ea8076-f1-cmd.dtsi b/arch/arm64/boot/dts/qcom/xiaomi/overlay/common/display/dsi-panel-samsung-fhd-ea8076-f1-cmd.dtsi
+index b0b7d5341..e587d9340 100644
+--- a/arch/arm64/boot/dts/qcom/xiaomi/overlay/common/display/dsi-panel-samsung-fhd-ea8076-f1-cmd.dtsi
++++ b/arch/arm64/boot/dts/qcom/xiaomi/overlay/common/display/dsi-panel-samsung-fhd-ea8076-f1-cmd.dtsi
+@@ -65,6 +65,30 @@
+ 
+ 		qcom,disp-doze-backlight-threshold = <8>;
+ 		qcom,disp-fod-off-dimming-delay = <85>;
++		qcom,disp-fod-dim-lut = <
++			/* brightness, alpha */
++			0	0xFF
++			4	0xEB
++			8	0xEA
++			12	0xE9
++			13	0xE8
++			20	0xE5
++			24	0xE3
++			30	0xE0
++			68	0xD0
++			133	0xC0
++			218	0xB0
++			328	0xA0
++			486	0x90
++			642	0x80
++			832	0x70
++			1043	0x60
++			1267	0x50
++			1500	0x40
++			1770	0x30
++			2000	0x24
++			2047	0x21
++		>;
+ 
+ 		qcom,elvss_dimming_check_enable;
+ 		qcom,mdss-dsi-panel-elvss-dimming-read-length = <1>;
+diff --git a/arch/arm64/boot/dts/qcom/xiaomi/overlay/common/display/dsi-panel-samsung-fhd-ea8076-f1mp-cmd.dtsi b/arch/arm64/boot/dts/qcom/xiaomi/overlay/common/display/dsi-panel-samsung-fhd-ea8076-f1mp-cmd.dtsi
+index 75bf0dd6e..db0ab4a29 100644
+--- a/arch/arm64/boot/dts/qcom/xiaomi/overlay/common/display/dsi-panel-samsung-fhd-ea8076-f1mp-cmd.dtsi
++++ b/arch/arm64/boot/dts/qcom/xiaomi/overlay/common/display/dsi-panel-samsung-fhd-ea8076-f1mp-cmd.dtsi
+@@ -65,6 +65,30 @@
+ 
+ 		qcom,disp-doze-backlight-threshold = <8>;
+ 		qcom,disp-fod-off-dimming-delay = <85>;
++		qcom,disp-fod-dim-lut = <
++			/* brightness, alpha */
++			0	0xFF
++			4	0xEB
++			8	0xEA
++			12	0xE9
++			13	0xE8
++			20	0xE5
++			24	0xE3
++			30	0xE0
++			68	0xD0
++			133	0xC0
++			218	0xB0
++			328	0xA0
++			486	0x90
++			642	0x80
++			832	0x70
++			1043	0x60
++			1267	0x50
++			1500	0x40
++			1770	0x30
++			2000	0x24
++			2047	0x21
++		>;
+ 
+ 		qcom,elvss_dimming_check_enable;
+ 		qcom,mdss-dsi-panel-elvss-dimming-read-length = <1>;
+diff --git a/arch/arm64/boot/dts/qcom/xiaomi/overlay/common/display/dsi-panel-samsung-fhd-ea8076-f1p2-2-cmd.dtsi b/arch/arm64/boot/dts/qcom/xiaomi/overlay/common/display/dsi-panel-samsung-fhd-ea8076-f1p2-2-cmd.dtsi
+index 9110a4e77..c2cc615f2 100644
+--- a/arch/arm64/boot/dts/qcom/xiaomi/overlay/common/display/dsi-panel-samsung-fhd-ea8076-f1p2-2-cmd.dtsi
++++ b/arch/arm64/boot/dts/qcom/xiaomi/overlay/common/display/dsi-panel-samsung-fhd-ea8076-f1p2-2-cmd.dtsi
+@@ -65,6 +65,30 @@
+ 
+ 		qcom,disp-doze-backlight-threshold = <8>;
+ 		qcom,disp-fod-off-dimming-delay = <85>;
++		qcom,disp-fod-dim-lut = <
++			/* brightness, alpha */
++			0	0xFF
++			4	0xEB
++			8	0xEA
++			12	0xE9
++			13	0xE8
++			20	0xE5
++			24	0xE3
++			30	0xE0
++			68	0xD0
++			133	0xC0
++			218	0xB0
++			328	0xA0
++			486	0x90
++			642	0x80
++			832	0x70
++			1043	0x60
++			1267	0x50
++			1500	0x40
++			1770	0x30
++			2000	0x24
++			2047	0x21
++		>;
+ 
+ 		qcom,elvss_dimming_check_enable;
+ 		qcom,mdss-dsi-panel-elvss-dimming-read-length = <1>;
+diff --git a/arch/arm64/boot/dts/qcom/xiaomi/overlay/common/display/dsi-panel-samsung-fhd-ea8076-f1p2-cmd.dtsi b/arch/arm64/boot/dts/qcom/xiaomi/overlay/common/display/dsi-panel-samsung-fhd-ea8076-f1p2-cmd.dtsi
+index 47082c5b3..715f89aba 100644
+--- a/arch/arm64/boot/dts/qcom/xiaomi/overlay/common/display/dsi-panel-samsung-fhd-ea8076-f1p2-cmd.dtsi
++++ b/arch/arm64/boot/dts/qcom/xiaomi/overlay/common/display/dsi-panel-samsung-fhd-ea8076-f1p2-cmd.dtsi
+@@ -65,6 +65,30 @@
+ 
+ 		qcom,disp-doze-backlight-threshold = <8>;
+ 		qcom,disp-fod-off-dimming-delay = <85>;
++		qcom,disp-fod-dim-lut = <
++			/* brightness, alpha */
++			0	0xFF
++			4	0xEB
++			8	0xEA
++			12	0xE9
++			13	0xE8
++			20	0xE5
++			24	0xE3
++			30	0xE0
++			68	0xD0
++			133	0xC0
++			218	0xB0
++			328	0xA0
++			486	0x90
++			642	0x80
++			832	0x70
++			1043	0x60
++			1267	0x50
++			1500	0x40
++			1770	0x30
++			2000	0x24
++			2047	0x21
++		>;
+ 
+ 		qcom,elvss_dimming_check_enable;
+ 		qcom,mdss-dsi-panel-elvss-dimming-read-length = <1>;
+diff --git a/arch/arm64/boot/dts/qcom/xiaomi/overlay/common/display/dsi-panel-samsung-fhd-ea8076-f1s-cmd.dtsi b/arch/arm64/boot/dts/qcom/xiaomi/overlay/common/display/dsi-panel-samsung-fhd-ea8076-f1s-cmd.dtsi
+index 1ece19895..2bcc28432 100644
+--- a/arch/arm64/boot/dts/qcom/xiaomi/overlay/common/display/dsi-panel-samsung-fhd-ea8076-f1s-cmd.dtsi
++++ b/arch/arm64/boot/dts/qcom/xiaomi/overlay/common/display/dsi-panel-samsung-fhd-ea8076-f1s-cmd.dtsi
+@@ -65,6 +65,30 @@
+ 		qcom,esd-err-irq-gpio = <&tlmm 5 0x2002>;
+ 
+ 		qcom,disp-doze-backlight-threshold = <8>;
++		qcom,disp-fod-dim-lut = <
++			/* brightness, alpha */
++			0	0xFF
++			4	0xEB
++			8	0xEA
++			12	0xE9
++			13	0xE8
++			20	0xE5
++			24	0xE3
++			30	0xE0
++			68	0xD0
++			133	0xC0
++			218	0xB0
++			328	0xA0
++			486	0x90
++			642	0x80
++			832	0x70
++			1043	0x60
++			1267	0x50
++			1500	0x40
++			1770	0x30
++			2000	0x24
++			2047	0x21
++		>;
+ 
+ 		qcom,elvss_dimming_check_enable;
+ 		qcom,mdss-dsi-panel-elvss-dimming-read-length = <1>;
+diff --git a/arch/arm64/boot/dts/qcom/xiaomi/overlay/common/display/dsi-panel-ss-fhd-ea8076-cmd.dtsi b/arch/arm64/boot/dts/qcom/xiaomi/overlay/common/display/dsi-panel-ss-fhd-ea8076-cmd.dtsi
+index fc1deae7f..cd4a9eacc 100644
+--- a/arch/arm64/boot/dts/qcom/xiaomi/overlay/common/display/dsi-panel-ss-fhd-ea8076-cmd.dtsi
++++ b/arch/arm64/boot/dts/qcom/xiaomi/overlay/common/display/dsi-panel-ss-fhd-ea8076-cmd.dtsi
+@@ -66,6 +66,30 @@
+ 
+ 		qcom,disp-doze-backlight-threshold = <8>;
+ 		qcom,disp-fod-off-dimming-delay = <85>;
++		qcom,disp-fod-dim-lut = <
++			/* brightness, alpha */
++			0	0xFF
++			4	0xEB
++			8	0xEA
++			12	0xE9
++			13	0xE8
++			20	0xE5
++			24	0xE3
++			30	0xE0
++			68	0xD0
++			133	0xC0
++			218	0xB0
++			328	0xA0
++			486	0x90
++			642	0x80
++			832	0x70
++			1043	0x60
++			1267	0x50
++			1500	0x40
++			1770	0x30
++			2000	0x24
++			2047	0x21
++		>;
+ 
+ 		qcom,elvss_dimming_check_enable;
+ 		qcom,mdss-dsi-panel-elvss-dimming-read-length = <1>;
+diff --git a/arch/arm64/boot/dts/qcom/xiaomi/overlay/common/display/dsi-panel-ss-fhd-ea8076-global-cmd.dtsi b/arch/arm64/boot/dts/qcom/xiaomi/overlay/common/display/dsi-panel-ss-fhd-ea8076-global-cmd.dtsi
+index 1c0e690d7..d937de2f6 100644
+--- a/arch/arm64/boot/dts/qcom/xiaomi/overlay/common/display/dsi-panel-ss-fhd-ea8076-global-cmd.dtsi
++++ b/arch/arm64/boot/dts/qcom/xiaomi/overlay/common/display/dsi-panel-ss-fhd-ea8076-global-cmd.dtsi
+@@ -66,6 +66,30 @@
+ 
+ 		qcom,disp-doze-backlight-threshold = <8>;
+ 		qcom,disp-fod-off-dimming-delay = <85>;
++		qcom,disp-fod-dim-lut = <
++			/* brightness, alpha */
++			0	0xFF
++			4	0xEB
++			8	0xEA
++			12	0xE9
++			13	0xE8
++			20	0xE5
++			24	0xE3
++			30	0xE0
++			68	0xD0
++			133	0xC0
++			218	0xB0
++			328	0xA0
++			486	0x90
++			642	0x80
++			832	0x70
++			1043	0x60
++			1267	0x50
++			1500	0x40
++			1770	0x30
++			2000	0x24
++			2047	0x21
++		>;
+ 
+ 		qcom,elvss_dimming_check_enable;
+ 		qcom,mdss-dsi-panel-elvss-dimming-read-length = <1>;
+-- 
+2.52.0
+

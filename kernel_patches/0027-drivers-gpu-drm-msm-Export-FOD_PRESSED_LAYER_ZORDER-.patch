@@ -1,0 +1,44 @@
+From 3bca94cf9d5471931895dfdeede3ecb46fbcc719 Mon Sep 17 00:00:00 2001
+From: Pig <pig.priv@gmail.com>
+Date: Fri, 14 Aug 2020 20:06:43 +0800
+Subject: [PATCH 027/115] drivers: gpu: drm: msm: Export
+ FOD_PRESSED_LAYER_ZORDER to uapi
+
+Change-Id: I5b25d19fab3a2901948d639c785165e70786f4ab
+---
+ drivers/gpu/drm/msm/sde/sde_plane.c | 4 ++--
+ include/uapi/drm/sde_drm.h          | 5 +++++
+ 2 files changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/gpu/drm/msm/sde/sde_plane.c b/drivers/gpu/drm/msm/sde/sde_plane.c
+index 5fe08e3af..285ebf053 100644
+--- a/drivers/gpu/drm/msm/sde/sde_plane.c
++++ b/drivers/gpu/drm/msm/sde/sde_plane.c
+@@ -4868,8 +4868,8 @@ static int sde_plane_atomic_set_property(struct drm_plane *plane,
+ 		idx = msm_property_index(&psde->property_info,
+ 				property);
+ 		if (idx == PLANE_PROP_ZPOS) {
+-			if (val & 0x20000000u) {
+-				val &= ~0x20000000u;
++			if (val & FOD_PRESSED_LAYER_ZORDER) {
++				val &= ~FOD_PRESSED_LAYER_ZORDER;
+ 				fod_val = 1;
+ 			}
+ 
+diff --git a/include/uapi/drm/sde_drm.h b/include/uapi/drm/sde_drm.h
+index d241a307f..7676aaed2 100644
+--- a/include/uapi/drm/sde_drm.h
++++ b/include/uapi/drm/sde_drm.h
+@@ -495,4 +495,9 @@ struct sde_drm_roi_misr_v1 {
+ #define SDE_RECOVERY_CAPTURE		1
+ #define SDE_RECOVERY_HARD_RESET		2
+ 
++/**
++ * sde fod dim layer
++ */
++#define FOD_PRESSED_LAYER_ZORDER 0x20000000u
++
+ #endif /* _SDE_DRM_H_ */
+-- 
+2.52.0
+

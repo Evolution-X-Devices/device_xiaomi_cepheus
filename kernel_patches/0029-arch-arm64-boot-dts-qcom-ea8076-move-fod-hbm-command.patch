@@ -1,0 +1,461 @@
+From a71b20f8ea261c5febfd1d39d7f9a7eef58a2cae Mon Sep 17 00:00:00 2001
+From: Demon000 <demonsingur@gmail.com>
+Date: Tue, 18 Feb 2020 23:00:01 +0200
+Subject: [PATCH 029/115] arch: arm64: boot: dts: qcom: ea8076: move fod hbm
+ commands to their proper place
+
+Change-Id: Ia8a6cd27fbf63aeadbe2577cfb56b9d56fe0687c
+---
+ .../dsi-panel-samsung-fhd-ea8076-f1-cmd.dtsi  | 45 ++++++++++---------
+ ...dsi-panel-samsung-fhd-ea8076-f1mp-cmd.dtsi | 45 ++++++++++---------
+ ...i-panel-samsung-fhd-ea8076-f1p2-2-cmd.dtsi | 45 ++++++++++---------
+ ...dsi-panel-samsung-fhd-ea8076-f1p2-cmd.dtsi | 45 ++++++++++---------
+ .../dsi-panel-samsung-fhd-ea8076-f1s-cmd.dtsi | 45 ++++++++++---------
+ .../display/dsi-panel-ss-fhd-ea8076-cmd.dtsi  | 45 ++++++++++---------
+ .../dsi-panel-ss-fhd-ea8076-global-cmd.dtsi   | 45 ++++++++++---------
+ 7 files changed, 161 insertions(+), 154 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/qcom/xiaomi/overlay/common/display/dsi-panel-samsung-fhd-ea8076-f1-cmd.dtsi b/arch/arm64/boot/dts/qcom/xiaomi/overlay/common/display/dsi-panel-samsung-fhd-ea8076-f1-cmd.dtsi
+index 3c1462365..36343965a 100644
+--- a/arch/arm64/boot/dts/qcom/xiaomi/overlay/common/display/dsi-panel-samsung-fhd-ea8076-f1-cmd.dtsi
++++ b/arch/arm64/boot/dts/qcom/xiaomi/overlay/common/display/dsi-panel-samsung-fhd-ea8076-f1-cmd.dtsi
+@@ -72,28 +72,6 @@
+ 		qcom,mdss-dsi-dispparam-elvss-dimming-offset-command-state = "dsi_hs_mode";
+ 		qcom,mdss-dsi-dispparam-elvss-dimming-read-command = [06 01 00 01 00 00 01 B7];
+ 		qcom,mdss-dsi-dispparam-elvss-dimming-read-command-state = "dsi_hs_mode";
+-		qcom,mdss-dsi-dispparam-hbm-fod-off-command = [
+-					39 01 00 00 00 00 02 53 20
+-					39 00 00 00 00 00 03 F0 5A 5A
+-					39 00 00 00 00 00 03 B7 01 4B
+-					39 00 00 00 00 00 02 B0 03
+-					39 00 00 00 00 00 02 B7 49
+-					39 00 00 00 00 00 02 B0 07
+-					39 00 00 00 00 00 02 B7 91
+-					39 01 00 00 01 00 03 F0 A5 A5];
+-		qcom,mdss-dsi-dispparam-hbm-fod-off-command-state = "dsi_hs_mode";
+-		qcom,mdss-dsi-dispparam-hbm-fod-on-command = [
+-					39 00 00 00 00 00 03 F0 5A 5A
+-					39 00 00 00 00 00 02 B0 03
+-					39 00 00 00 00 00 02 B7 C9
+-					39 00 00 00 00 00 02 B0 07
+-					39 00 00 00 00 00 02 B7 91
+-					39 00 00 00 00 00 03 F0 A5 A5
+-					39 01 00 00 01 00 02 53 E0
+-					39 00 00 00 00 00 03 F0 5A 5A
+-					39 00 00 00 00 00 03 B7 01 43
+-					39 01 00 00 01 00 03 F0 A5 A5];
+-		qcom,mdss-dsi-dispparam-hbm-fod-on-command-state = "dsi_hs_mode";
+ 
+ 		qcom,mdss-dsi-display-timings {
+ 			timing@0{
+@@ -248,6 +226,29 @@
+ 					39 01 00 00 01 00 03 F0 A5 A5];
+ 				qcom,mdss-dsi-dispparam-elvss-dimming-off-command-state = "dsi_lp_mode";
+ 				qcom,mdss-dsi-h-sync-pulse = <0>;
++
++				qcom,mdss-dsi-dispparam-hbm-fod-off-command = [
++					39 01 00 00 00 00 02 53 20
++					39 00 00 00 00 00 03 F0 5A 5A
++					39 00 00 00 00 00 03 B7 01 4B
++					39 00 00 00 00 00 02 B0 03
++					39 00 00 00 00 00 02 B7 49
++					39 00 00 00 00 00 02 B0 07
++					39 00 00 00 00 00 02 B7 91
++					39 01 00 00 01 00 03 F0 A5 A5];
++				qcom,mdss-dsi-dispparam-hbm-fod-off-command-state = "dsi_hs_mode";
++				qcom,mdss-dsi-dispparam-hbm-fod-on-command = [
++					39 00 00 00 00 00 03 F0 5A 5A
++					39 00 00 00 00 00 02 B0 03
++					39 00 00 00 00 00 02 B7 C9
++					39 00 00 00 00 00 02 B0 07
++					39 00 00 00 00 00 02 B7 91
++					39 00 00 00 00 00 03 F0 A5 A5
++					39 01 00 00 01 00 02 53 E0
++					39 00 00 00 00 00 03 F0 5A 5A
++					39 00 00 00 00 00 03 B7 01 43
++					39 01 00 00 01 00 03 F0 A5 A5];
++				qcom,mdss-dsi-dispparam-hbm-fod-on-command-state = "dsi_hs_mode";
+ 			};
+ 		};
+ 	};
+diff --git a/arch/arm64/boot/dts/qcom/xiaomi/overlay/common/display/dsi-panel-samsung-fhd-ea8076-f1mp-cmd.dtsi b/arch/arm64/boot/dts/qcom/xiaomi/overlay/common/display/dsi-panel-samsung-fhd-ea8076-f1mp-cmd.dtsi
+index 42c7ecc8e..76e9564aa 100644
+--- a/arch/arm64/boot/dts/qcom/xiaomi/overlay/common/display/dsi-panel-samsung-fhd-ea8076-f1mp-cmd.dtsi
++++ b/arch/arm64/boot/dts/qcom/xiaomi/overlay/common/display/dsi-panel-samsung-fhd-ea8076-f1mp-cmd.dtsi
+@@ -72,28 +72,6 @@
+ 		qcom,mdss-dsi-dispparam-elvss-dimming-offset-command-state = "dsi_hs_mode";
+ 		qcom,mdss-dsi-dispparam-elvss-dimming-read-command = [06 01 00 01 00 00 01 B7];
+ 		qcom,mdss-dsi-dispparam-elvss-dimming-read-command-state = "dsi_hs_mode";
+-		qcom,mdss-dsi-dispparam-hbm-fod-off-command = [
+-					39 01 00 00 00 00 02 53 20
+-					39 00 00 00 00 00 03 F0 5A 5A
+-					39 00 00 00 00 00 03 B7 01 4B
+-					39 00 00 00 00 00 02 B0 03
+-					39 00 00 00 00 00 02 B7 49
+-					39 00 00 00 00 00 02 B0 07
+-					39 00 00 00 00 00 02 B7 91
+-					39 01 00 00 01 00 03 F0 A5 A5];
+-		qcom,mdss-dsi-dispparam-hbm-fod-off-command-state = "dsi_hs_mode";
+-		qcom,mdss-dsi-dispparam-hbm-fod-on-command = [
+-					39 00 00 00 00 00 03 F0 5A 5A
+-					39 00 00 00 00 00 02 B0 03
+-					39 00 00 00 00 00 02 B7 C9
+-					39 00 00 00 00 00 02 B0 07
+-					39 00 00 00 00 00 02 B7 91
+-					39 00 00 00 00 00 03 F0 A5 A5
+-					39 01 00 00 01 00 02 53 E0
+-					39 00 00 00 00 00 03 F0 5A 5A
+-					39 00 00 00 00 00 03 B7 01 43
+-					39 01 00 00 01 00 03 F0 A5 A5];
+-		qcom,mdss-dsi-dispparam-hbm-fod-on-command-state = "dsi_hs_mode";
+ 
+ 		qcom,mdss-dsi-display-timings {
+ 			timing@0{
+@@ -248,6 +226,29 @@
+ 					39 01 00 00 01 00 03 F0 A5 A5];
+ 				qcom,mdss-dsi-dispparam-elvss-dimming-off-command-state = "dsi_lp_mode";
+ 				qcom,mdss-dsi-h-sync-pulse = <0>;
++
++				qcom,mdss-dsi-dispparam-hbm-fod-off-command = [
++					39 01 00 00 00 00 02 53 20
++					39 00 00 00 00 00 03 F0 5A 5A
++					39 00 00 00 00 00 03 B7 01 4B
++					39 00 00 00 00 00 02 B0 03
++					39 00 00 00 00 00 02 B7 49
++					39 00 00 00 00 00 02 B0 07
++					39 00 00 00 00 00 02 B7 91
++					39 01 00 00 01 00 03 F0 A5 A5];
++				qcom,mdss-dsi-dispparam-hbm-fod-off-command-state = "dsi_hs_mode";
++				qcom,mdss-dsi-dispparam-hbm-fod-on-command = [
++					39 00 00 00 00 00 03 F0 5A 5A
++					39 00 00 00 00 00 02 B0 03
++					39 00 00 00 00 00 02 B7 C9
++					39 00 00 00 00 00 02 B0 07
++					39 00 00 00 00 00 02 B7 91
++					39 00 00 00 00 00 03 F0 A5 A5
++					39 01 00 00 01 00 02 53 E0
++					39 00 00 00 00 00 03 F0 5A 5A
++					39 00 00 00 00 00 03 B7 01 43
++					39 01 00 00 01 00 03 F0 A5 A5];
++				qcom,mdss-dsi-dispparam-hbm-fod-on-command-state = "dsi_hs_mode";
+ 			};
+ 		};
+ 	};
+diff --git a/arch/arm64/boot/dts/qcom/xiaomi/overlay/common/display/dsi-panel-samsung-fhd-ea8076-f1p2-2-cmd.dtsi b/arch/arm64/boot/dts/qcom/xiaomi/overlay/common/display/dsi-panel-samsung-fhd-ea8076-f1p2-2-cmd.dtsi
+index 437185f1b..04444e5ac 100644
+--- a/arch/arm64/boot/dts/qcom/xiaomi/overlay/common/display/dsi-panel-samsung-fhd-ea8076-f1p2-2-cmd.dtsi
++++ b/arch/arm64/boot/dts/qcom/xiaomi/overlay/common/display/dsi-panel-samsung-fhd-ea8076-f1p2-2-cmd.dtsi
+@@ -72,28 +72,6 @@
+ 		qcom,mdss-dsi-dispparam-elvss-dimming-offset-command-state = "dsi_hs_mode";
+ 		qcom,mdss-dsi-dispparam-elvss-dimming-read-command = [06 01 00 01 00 00 01 B7];
+ 		qcom,mdss-dsi-dispparam-elvss-dimming-read-command-state = "dsi_hs_mode";
+-		qcom,mdss-dsi-dispparam-hbm-fod-off-command = [
+-					39 01 00 00 00 00 02 53 20
+-					39 00 00 00 00 00 03 F0 5A 5A
+-					39 00 00 00 00 00 03 B7 01 4B
+-					39 00 00 00 00 00 02 B0 03
+-					39 00 00 00 00 00 02 B7 49
+-					39 00 00 00 00 00 02 B0 07
+-					39 00 00 00 00 00 02 B7 91
+-					39 01 00 00 01 00 03 F0 A5 A5];
+-		qcom,mdss-dsi-dispparam-hbm-fod-off-command-state = "dsi_hs_mode";
+-		qcom,mdss-dsi-dispparam-hbm-fod-on-command = [
+-					39 00 00 00 00 00 03 F0 5A 5A
+-					39 00 00 00 00 00 02 B0 03
+-					39 00 00 00 00 00 02 B7 C9
+-					39 00 00 00 00 00 02 B0 07
+-					39 00 00 00 00 00 02 B7 91
+-					39 00 00 00 00 00 03 F0 A5 A5
+-					39 01 00 00 01 00 02 53 E0
+-					39 00 00 00 00 00 03 F0 5A 5A
+-					39 00 00 00 00 00 03 B7 01 43
+-					39 01 00 00 01 00 03 F0 A5 A5];
+-		qcom,mdss-dsi-dispparam-hbm-fod-on-command-state = "dsi_hs_mode";
+ 
+ 		qcom,mdss-dsi-display-timings {
+ 			timing@0{
+@@ -248,6 +226,29 @@
+ 					39 01 00 00 01 00 03 F0 A5 A5];
+ 				qcom,mdss-dsi-dispparam-elvss-dimming-off-command-state = "dsi_lp_mode";
+ 				qcom,mdss-dsi-h-sync-pulse = <0>;
++
++				qcom,mdss-dsi-dispparam-hbm-fod-off-command = [
++					39 01 00 00 00 00 02 53 20
++					39 00 00 00 00 00 03 F0 5A 5A
++					39 00 00 00 00 00 03 B7 01 4B
++					39 00 00 00 00 00 02 B0 03
++					39 00 00 00 00 00 02 B7 49
++					39 00 00 00 00 00 02 B0 07
++					39 00 00 00 00 00 02 B7 91
++					39 01 00 00 01 00 03 F0 A5 A5];
++				qcom,mdss-dsi-dispparam-hbm-fod-off-command-state = "dsi_hs_mode";
++				qcom,mdss-dsi-dispparam-hbm-fod-on-command = [
++					39 00 00 00 00 00 03 F0 5A 5A
++					39 00 00 00 00 00 02 B0 03
++					39 00 00 00 00 00 02 B7 C9
++					39 00 00 00 00 00 02 B0 07
++					39 00 00 00 00 00 02 B7 91
++					39 00 00 00 00 00 03 F0 A5 A5
++					39 01 00 00 01 00 02 53 E0
++					39 00 00 00 00 00 03 F0 5A 5A
++					39 00 00 00 00 00 03 B7 01 43
++					39 01 00 00 01 00 03 F0 A5 A5];
++				qcom,mdss-dsi-dispparam-hbm-fod-on-command-state = "dsi_hs_mode";
+ 			};
+ 		};
+ 	};
+diff --git a/arch/arm64/boot/dts/qcom/xiaomi/overlay/common/display/dsi-panel-samsung-fhd-ea8076-f1p2-cmd.dtsi b/arch/arm64/boot/dts/qcom/xiaomi/overlay/common/display/dsi-panel-samsung-fhd-ea8076-f1p2-cmd.dtsi
+index 15821d208..76e961997 100644
+--- a/arch/arm64/boot/dts/qcom/xiaomi/overlay/common/display/dsi-panel-samsung-fhd-ea8076-f1p2-cmd.dtsi
++++ b/arch/arm64/boot/dts/qcom/xiaomi/overlay/common/display/dsi-panel-samsung-fhd-ea8076-f1p2-cmd.dtsi
+@@ -72,28 +72,6 @@
+ 		qcom,mdss-dsi-dispparam-elvss-dimming-offset-command-state = "dsi_hs_mode";
+ 		qcom,mdss-dsi-dispparam-elvss-dimming-read-command = [06 01 00 01 00 00 01 B7];
+ 		qcom,mdss-dsi-dispparam-elvss-dimming-read-command-state = "dsi_hs_mode";
+-		qcom,mdss-dsi-dispparam-hbm-fod-off-command = [
+-					39 01 00 00 00 00 02 53 20
+-					39 00 00 00 00 00 03 F0 5A 5A
+-					39 00 00 00 00 00 03 B7 01 4B
+-					39 00 00 00 00 00 02 B0 03
+-					39 00 00 00 00 00 02 B7 49
+-					39 00 00 00 00 00 02 B0 07
+-					39 00 00 00 00 00 02 B7 91
+-					39 01 00 00 01 00 03 F0 A5 A5];
+-		qcom,mdss-dsi-dispparam-hbm-fod-off-command-state = "dsi_hs_mode";
+-		qcom,mdss-dsi-dispparam-hbm-fod-on-command = [
+-					39 00 00 00 00 00 03 F0 5A 5A
+-					39 00 00 00 00 00 02 B0 03
+-					39 00 00 00 00 00 02 B7 C9
+-					39 00 00 00 00 00 02 B0 07
+-					39 00 00 00 00 00 02 B7 91
+-					39 00 00 00 00 00 03 F0 A5 A5
+-					39 01 00 00 01 00 02 53 E0
+-					39 00 00 00 00 00 03 F0 5A 5A
+-					39 00 00 00 00 00 03 B7 01 43
+-					39 01 00 00 01 00 03 F0 A5 A5];
+-		qcom,mdss-dsi-dispparam-hbm-fod-on-command-state = "dsi_hs_mode";
+ 
+ 		qcom,mdss-dsi-display-timings {
+ 			timing@0{
+@@ -248,6 +226,29 @@
+ 					39 01 00 00 01 00 03 F0 A5 A5];
+ 				qcom,mdss-dsi-dispparam-elvss-dimming-off-command-state = "dsi_lp_mode";
+ 				qcom,mdss-dsi-h-sync-pulse = <0>;
++
++				qcom,mdss-dsi-dispparam-hbm-fod-off-command = [
++					39 01 00 00 00 00 02 53 20
++					39 00 00 00 00 00 03 F0 5A 5A
++					39 00 00 00 00 00 03 B7 01 4B
++					39 00 00 00 00 00 02 B0 03
++					39 00 00 00 00 00 02 B7 49
++					39 00 00 00 00 00 02 B0 07
++					39 00 00 00 00 00 02 B7 91
++					39 01 00 00 01 00 03 F0 A5 A5];
++				qcom,mdss-dsi-dispparam-hbm-fod-off-command-state = "dsi_hs_mode";
++				qcom,mdss-dsi-dispparam-hbm-fod-on-command = [
++					39 00 00 00 00 00 03 F0 5A 5A
++					39 00 00 00 00 00 02 B0 03
++					39 00 00 00 00 00 02 B7 C9
++					39 00 00 00 00 00 02 B0 07
++					39 00 00 00 00 00 02 B7 91
++					39 00 00 00 00 00 03 F0 A5 A5
++					39 01 00 00 01 00 02 53 E0
++					39 00 00 00 00 00 03 F0 5A 5A
++					39 00 00 00 00 00 03 B7 01 43
++					39 01 00 00 01 00 03 F0 A5 A5];
++				qcom,mdss-dsi-dispparam-hbm-fod-on-command-state = "dsi_hs_mode";
+ 			};
+ 		};
+ 	};
+diff --git a/arch/arm64/boot/dts/qcom/xiaomi/overlay/common/display/dsi-panel-samsung-fhd-ea8076-f1s-cmd.dtsi b/arch/arm64/boot/dts/qcom/xiaomi/overlay/common/display/dsi-panel-samsung-fhd-ea8076-f1s-cmd.dtsi
+index c8b8191aa..d01da4830 100644
+--- a/arch/arm64/boot/dts/qcom/xiaomi/overlay/common/display/dsi-panel-samsung-fhd-ea8076-f1s-cmd.dtsi
++++ b/arch/arm64/boot/dts/qcom/xiaomi/overlay/common/display/dsi-panel-samsung-fhd-ea8076-f1s-cmd.dtsi
+@@ -72,28 +72,6 @@
+ 		qcom,mdss-dsi-dispparam-elvss-dimming-offset-command-state = "dsi_hs_mode";
+ 		qcom,mdss-dsi-dispparam-elvss-dimming-read-command = [06 01 00 01 00 00 01 B7];
+ 		qcom,mdss-dsi-dispparam-elvss-dimming-read-command-state = "dsi_hs_mode";
+-		qcom,mdss-dsi-dispparam-hbm-fod-off-command = [
+-					39 01 00 00 00 00 02 53 20
+-					39 00 00 00 00 00 03 F0 5A 5A
+-					39 00 00 00 00 00 03 B7 01 4B
+-					39 00 00 00 00 00 02 B0 03
+-					39 00 00 00 00 00 02 B7 49
+-					39 00 00 00 00 00 02 B0 07
+-					39 00 00 00 00 00 02 B7 91
+-					39 01 00 00 01 00 03 F0 A5 A5];
+-		qcom,mdss-dsi-dispparam-hbm-fod-off-command-state = "dsi_hs_mode";
+-		qcom,mdss-dsi-dispparam-hbm-fod-on-command = [
+-					39 00 00 00 00 00 03 F0 5A 5A
+-					39 00 00 00 00 00 02 B0 03
+-					39 00 00 00 00 00 02 B7 C9
+-					39 00 00 00 00 00 02 B0 07
+-					39 00 00 00 00 00 02 B7 91
+-					39 00 00 00 00 00 03 F0 A5 A5
+-					39 01 00 00 01 00 02 53 E0
+-					39 00 00 00 00 00 03 F0 5A 5A
+-					39 00 00 00 00 00 03 B7 01 43
+-					39 01 00 00 01 00 03 F0 A5 A5];
+-		qcom,mdss-dsi-dispparam-hbm-fod-on-command-state = "dsi_hs_mode";
+ 
+ 		/* WHITE POINT COMMAND */
+ 		qcom,mdss-dsi-panel-white-point-read-length = <8>;
+@@ -271,6 +249,29 @@
+ 					];
+ 				qcom,mdss-dsi-dispparam-flat-off-command-state = "dsi_lp_mode";
+ 				qcom,mdss-dsi-h-sync-pulse = <0>;
++
++				qcom,mdss-dsi-dispparam-hbm-fod-off-command = [
++					39 01 00 00 00 00 02 53 20
++					39 00 00 00 00 00 03 F0 5A 5A
++					39 00 00 00 00 00 03 B7 01 4B
++					39 00 00 00 00 00 02 B0 03
++					39 00 00 00 00 00 02 B7 49
++					39 00 00 00 00 00 02 B0 07
++					39 00 00 00 00 00 02 B7 91
++					39 01 00 00 01 00 03 F0 A5 A5];
++				qcom,mdss-dsi-dispparam-hbm-fod-off-command-state = "dsi_hs_mode";
++				qcom,mdss-dsi-dispparam-hbm-fod-on-command = [
++					39 00 00 00 00 00 03 F0 5A 5A
++					39 00 00 00 00 00 02 B0 03
++					39 00 00 00 00 00 02 B7 C9
++					39 00 00 00 00 00 02 B0 07
++					39 00 00 00 00 00 02 B7 91
++					39 00 00 00 00 00 03 F0 A5 A5
++					39 01 00 00 01 00 02 53 E0
++					39 00 00 00 00 00 03 F0 5A 5A
++					39 00 00 00 00 00 03 B7 01 43
++					39 01 00 00 01 00 03 F0 A5 A5];
++				qcom,mdss-dsi-dispparam-hbm-fod-on-command-state = "dsi_hs_mode";
+ 			};
+ 		};
+ 	};
+diff --git a/arch/arm64/boot/dts/qcom/xiaomi/overlay/common/display/dsi-panel-ss-fhd-ea8076-cmd.dtsi b/arch/arm64/boot/dts/qcom/xiaomi/overlay/common/display/dsi-panel-ss-fhd-ea8076-cmd.dtsi
+index 45b9d8419..582642725 100644
+--- a/arch/arm64/boot/dts/qcom/xiaomi/overlay/common/display/dsi-panel-ss-fhd-ea8076-cmd.dtsi
++++ b/arch/arm64/boot/dts/qcom/xiaomi/overlay/common/display/dsi-panel-ss-fhd-ea8076-cmd.dtsi
+@@ -73,28 +73,6 @@
+ 		qcom,mdss-dsi-dispparam-elvss-dimming-offset-command-state = "dsi_hs_mode";
+ 		qcom,mdss-dsi-dispparam-elvss-dimming-read-command = [06 01 00 01 00 00 01 B7];
+ 		qcom,mdss-dsi-dispparam-elvss-dimming-read-command-state = "dsi_hs_mode";
+-		qcom,mdss-dsi-dispparam-hbm-fod-off-command = [
+-					39 01 00 00 00 00 02 53 20
+-					39 00 00 00 00 00 03 F0 5A 5A
+-					39 00 00 00 00 00 03 B7 01 4B
+-					39 00 00 00 00 00 02 B0 03
+-					39 00 00 00 00 00 02 B7 49
+-					39 00 00 00 00 00 02 B0 07
+-					39 00 00 00 00 00 02 B7 91
+-					39 01 00 00 01 00 03 F0 A5 A5];
+-		qcom,mdss-dsi-dispparam-hbm-fod-off-command-state = "dsi_hs_mode";
+-		qcom,mdss-dsi-dispparam-hbm-fod-on-command = [
+-					39 00 00 00 00 00 03 F0 5A 5A
+-					39 00 00 00 00 00 02 B0 03
+-					39 00 00 00 00 00 02 B7 C9
+-					39 00 00 00 00 00 02 B0 07
+-					39 00 00 00 00 00 02 B7 91
+-					39 00 00 00 00 00 03 F0 A5 A5
+-					39 01 00 00 01 00 02 53 E0
+-					39 00 00 00 00 00 03 F0 5A 5A
+-					39 00 00 00 00 00 03 B7 01 43
+-					39 01 00 00 01 00 03 F0 A5 A5];
+-		qcom,mdss-dsi-dispparam-hbm-fod-on-command-state = "dsi_hs_mode";
+ 
+ 		qcom,mdss-dsi-display-timings {
+ 			timing@0{
+@@ -236,6 +214,29 @@
+ 					39 01 00 00 01 00 03 F0 A5 A5];
+ 				qcom,mdss-dsi-dispparam-elvss-dimming-off-command-state = "dsi_lp_mode";
+ 				qcom,mdss-dsi-h-sync-pulse = <0>;
++
++				qcom,mdss-dsi-dispparam-hbm-fod-off-command = [
++					39 01 00 00 00 00 02 53 20
++					39 00 00 00 00 00 03 F0 5A 5A
++					39 00 00 00 00 00 03 B7 01 4B
++					39 00 00 00 00 00 02 B0 03
++					39 00 00 00 00 00 02 B7 49
++					39 00 00 00 00 00 02 B0 07
++					39 00 00 00 00 00 02 B7 91
++					39 01 00 00 01 00 03 F0 A5 A5];
++				qcom,mdss-dsi-dispparam-hbm-fod-off-command-state = "dsi_hs_mode";
++				qcom,mdss-dsi-dispparam-hbm-fod-on-command = [
++					39 00 00 00 00 00 03 F0 5A 5A
++					39 00 00 00 00 00 02 B0 03
++					39 00 00 00 00 00 02 B7 C9
++					39 00 00 00 00 00 02 B0 07
++					39 00 00 00 00 00 02 B7 91
++					39 00 00 00 00 00 03 F0 A5 A5
++					39 01 00 00 01 00 02 53 E0
++					39 00 00 00 00 00 03 F0 5A 5A
++					39 00 00 00 00 00 03 B7 01 43
++					39 01 00 00 01 00 03 F0 A5 A5];
++				qcom,mdss-dsi-dispparam-hbm-fod-on-command-state = "dsi_hs_mode";
+ 			};
+ 		};
+ 	};
+diff --git a/arch/arm64/boot/dts/qcom/xiaomi/overlay/common/display/dsi-panel-ss-fhd-ea8076-global-cmd.dtsi b/arch/arm64/boot/dts/qcom/xiaomi/overlay/common/display/dsi-panel-ss-fhd-ea8076-global-cmd.dtsi
+index ffcca3536..4f66145f9 100644
+--- a/arch/arm64/boot/dts/qcom/xiaomi/overlay/common/display/dsi-panel-ss-fhd-ea8076-global-cmd.dtsi
++++ b/arch/arm64/boot/dts/qcom/xiaomi/overlay/common/display/dsi-panel-ss-fhd-ea8076-global-cmd.dtsi
+@@ -73,28 +73,6 @@
+ 		qcom,mdss-dsi-dispparam-elvss-dimming-offset-command-state = "dsi_hs_mode";
+ 		qcom,mdss-dsi-dispparam-elvss-dimming-read-command = [06 01 00 01 00 00 01 B7];
+ 		qcom,mdss-dsi-dispparam-elvss-dimming-read-command-state = "dsi_hs_mode";
+-		qcom,mdss-dsi-dispparam-hbm-fod-off-command = [
+-					39 01 00 00 00 00 02 53 20
+-					39 00 00 00 00 00 03 F0 5A 5A
+-					39 00 00 00 00 00 03 B7 01 4B
+-					39 00 00 00 00 00 02 B0 03
+-					39 00 00 00 00 00 02 B7 49
+-					39 00 00 00 00 00 02 B0 07
+-					39 00 00 00 00 00 02 B7 91
+-					39 01 00 00 01 00 03 F0 A5 A5];
+-		qcom,mdss-dsi-dispparam-hbm-fod-off-command-state = "dsi_hs_mode";
+-		qcom,mdss-dsi-dispparam-hbm-fod-on-command = [
+-					39 00 00 00 00 00 03 F0 5A 5A
+-					39 00 00 00 00 00 02 B0 03
+-					39 00 00 00 00 00 02 B7 C9
+-					39 00 00 00 00 00 02 B0 07
+-					39 00 00 00 00 00 02 B7 91
+-					39 00 00 00 00 00 03 F0 A5 A5
+-					39 01 00 00 01 00 02 53 E0
+-					39 00 00 00 00 00 03 F0 5A 5A
+-					39 00 00 00 00 00 03 B7 01 43
+-					39 01 00 00 01 00 03 F0 A5 A5];
+-		qcom,mdss-dsi-dispparam-hbm-fod-on-command-state = "dsi_hs_mode";
+ 
+ 		qcom,mdss-dsi-display-timings {
+ 			timing@0{
+@@ -236,6 +214,29 @@
+ 					39 01 00 00 01 00 03 F0 A5 A5];
+ 				qcom,mdss-dsi-dispparam-elvss-dimming-off-command-state = "dsi_lp_mode";
+ 				qcom,mdss-dsi-h-sync-pulse = <0>;
++
++				qcom,mdss-dsi-dispparam-hbm-fod-off-command = [
++					39 01 00 00 00 00 02 53 20
++					39 00 00 00 00 00 03 F0 5A 5A
++					39 00 00 00 00 00 03 B7 01 4B
++					39 00 00 00 00 00 02 B0 03
++					39 00 00 00 00 00 02 B7 49
++					39 00 00 00 00 00 02 B0 07
++					39 00 00 00 00 00 02 B7 91
++					39 01 00 00 01 00 03 F0 A5 A5];
++				qcom,mdss-dsi-dispparam-hbm-fod-off-command-state = "dsi_hs_mode";
++				qcom,mdss-dsi-dispparam-hbm-fod-on-command = [
++					39 00 00 00 00 00 03 F0 5A 5A
++					39 00 00 00 00 00 02 B0 03
++					39 00 00 00 00 00 02 B7 C9
++					39 00 00 00 00 00 02 B0 07
++					39 00 00 00 00 00 02 B7 91
++					39 00 00 00 00 00 03 F0 A5 A5
++					39 01 00 00 01 00 02 53 E0
++					39 00 00 00 00 00 03 F0 5A 5A
++					39 00 00 00 00 00 03 B7 01 43
++					39 01 00 00 01 00 03 F0 A5 A5];
++				qcom,mdss-dsi-dispparam-hbm-fod-on-command-state = "dsi_hs_mode";
+ 			};
+ 		};
+ 	};
+-- 
+2.52.0
+

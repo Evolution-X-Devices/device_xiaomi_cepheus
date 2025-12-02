@@ -1,0 +1,24 @@
+From 4492738e6acd7a951c45e0d4f0b439c1f35aaaf0 Mon Sep 17 00:00:00 2001
+From: Sebastiano Barezzi <seba@sebaubuntu.dev>
+Date: Thu, 25 Apr 2024 00:50:18 +0200
+Subject: [PATCH 006/115] arch: arm64: configs: xiaomi: Enable EROFS
+
+Change-Id: If2d1802f013ea3a549868b2f280d4f4b63ed49f2
+---
+ arch/arm64/configs/vendor/xiaomi/sm8150-common.config | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/arch/arm64/configs/vendor/xiaomi/sm8150-common.config b/arch/arm64/configs/vendor/xiaomi/sm8150-common.config
+index 06a15cb7c..78436de13 100644
+--- a/arch/arm64/configs/vendor/xiaomi/sm8150-common.config
++++ b/arch/arm64/configs/vendor/xiaomi/sm8150-common.config
+@@ -6,3 +6,6 @@ CONFIG_QCA_CLD_WLAN=y
+ 
+ # exFAT
+ CONFIG_EXFAT_FS=y
++
++# EROFS
++CONFIG_EROFS_FS=y
+-- 
+2.52.0
+

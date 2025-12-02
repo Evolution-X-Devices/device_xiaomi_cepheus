@@ -1,0 +1,29 @@
+From f84bbba990f57adc99df7c1c385066e8d10508bf Mon Sep 17 00:00:00 2001
+From: Sebastiano Barezzi <barezzisebastiano@gmail.com>
+Date: Wed, 22 Jun 2022 19:39:49 +0200
+Subject: [PATCH 091/115] drivers: spi: Import Xiaomi changes
+
+Change-Id: Ic55a5b60361e6b9b5e4dd6d3b0adf4bf1780aeeb
+---
+ drivers/spi/spi-geni-qcom.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/drivers/spi/spi-geni-qcom.c b/drivers/spi/spi-geni-qcom.c
+index 25ac91e53..4f470d580 100644
+--- a/drivers/spi/spi-geni-qcom.c
++++ b/drivers/spi/spi-geni-qcom.c
+@@ -29,7 +29,11 @@
+ #include <soc/qcom/boot_stats.h>
+ 
+ #define SPI_NUM_CHIPSELECT	(4)
++#ifdef CONFIG_MACH_XIAOMI_SM8150
++#define SPI_XFER_TIMEOUT_MS	(1500)
++#else
+ #define SPI_XFER_TIMEOUT_MS	(250)
++#endif
+ #define SPI_AUTO_SUSPEND_DELAY	(250)
+ /* SPI SE specific registers */
+ #define SE_SPI_CPHA		(0x224)
+-- 
+2.52.0
+

@@ -1,0 +1,52 @@
+From 9e8da404811a2d4cb39cfaad8b0c01af8a752229 Mon Sep 17 00:00:00 2001
+From: Sebastiano Barezzi <seba@sebaubuntu.dev>
+Date: Tue, 16 Apr 2024 23:53:57 +0200
+Subject: [PATCH 011/115] arch: arm64: boot: dts: qcom: xiaomi: nabu: Remove
+ fingerprint bindings
+
+nabu doesn't have fingerprint, thanks Xiaomi
+
+Change-Id: Ide1fa63add29925e219f7b8c88d0ff225b9b11d4
+---
+ .../qcom/xiaomi/overlay/nabu/nabu-sm8150.dtsi | 25 -------------------
+ 1 file changed, 25 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/qcom/xiaomi/overlay/nabu/nabu-sm8150.dtsi b/arch/arm64/boot/dts/qcom/xiaomi/overlay/nabu/nabu-sm8150.dtsi
+index 06be84bc6..f31136085 100644
+--- a/arch/arm64/boot/dts/qcom/xiaomi/overlay/nabu/nabu-sm8150.dtsi
++++ b/arch/arm64/boot/dts/qcom/xiaomi/overlay/nabu/nabu-sm8150.dtsi
+@@ -488,31 +488,6 @@ And public attribution of xiaomi platforms(like J20S and so and)
+ 		gpio = <&pm8150b_gpios 5 0>;
+ 	 };
+ 
+-	fingerprint_goodix {
+-		compatible = "goodix,fingerprint";
+-		goodix,gpio-reset = <&tlmm 37 0x0>;
+-		goodix,gpio-irq = <&tlmm 120 0x0>;
+-		//goodix.gpio_pwr = <&tlmm 125 0x0>;
+-		//fp_vdd_vreg = <&pm8150l_l7>;
+-		status = "ok";
+-	};
+-
+-
+-        fingerprint_fpc {
+-               compatible = "fpc,fpc1020";
+-               fpc,gpio_rst    = <&tlmm 37 0x0>;
+-               fpc,gpio_irq    = <&tlmm 120 0x0>;
+-               pinctrl-names = "fpc1020_reset_reset",
+-                       "fpc1020_reset_active",
+-                       "fpc1020_irq_active";
+-
+-               pinctrl-0 = <&msm_gpio_37>;
+-               pinctrl-1 = <&msm_gpio_37_output_high>;
+-               pinctrl-2 = <&msm_gpio_120>;
+-               status = "ok";
+-       };
+-
+-
+ 	xiaomi_touch {
+ 		compatible = "xiaomi-touch";
+ 		status = "ok";
+-- 
+2.52.0
+

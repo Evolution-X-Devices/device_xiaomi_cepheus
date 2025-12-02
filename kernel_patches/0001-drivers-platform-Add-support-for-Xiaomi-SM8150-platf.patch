@@ -1,0 +1,86 @@
+From f22a7a0ae31fe9833c35d247fdf553c04199f2eb Mon Sep 17 00:00:00 2001
+From: Davide Garberi <dade.garberi@gmail.com>
+Date: Thu, 22 Aug 2019 02:27:05 +0200
+Subject: [PATCH 001/115] drivers: platform: Add support for Xiaomi SM8150
+ platform
+
+Change-Id: I3bbfd60dfa0dea0abf080d35fd3d6d14dec6e094
+---
+ drivers/platform/Kconfig        |  2 ++
+ drivers/platform/xiaomi/Kconfig | 54 +++++++++++++++++++++++++++++++++
+ 2 files changed, 56 insertions(+)
+ create mode 100644 drivers/platform/xiaomi/Kconfig
+
+diff --git a/drivers/platform/Kconfig b/drivers/platform/Kconfig
+index e29f6c2ad..ad9aeefe9 100644
+--- a/drivers/platform/Kconfig
++++ b/drivers/platform/Kconfig
+@@ -10,3 +10,5 @@ source "drivers/platform/goldfish/Kconfig"
+ source "drivers/platform/chrome/Kconfig"
+ 
+ source "drivers/platform/msm/Kconfig"
++
++source "drivers/platform/xiaomi/Kconfig"
+diff --git a/drivers/platform/xiaomi/Kconfig b/drivers/platform/xiaomi/Kconfig
+new file mode 100644
+index 000000000..5ff3df1d0
+--- /dev/null
++++ b/drivers/platform/xiaomi/Kconfig
+@@ -0,0 +1,54 @@
++# Xiaomi configuration options
++
++config MACH_XIAOMI
++	bool "Xiaomi device"
++	depends on ARCH_QCOM
++	help
++	  Support for Xiaomi products
++
++config MACH_XIAOMI_SM8150
++	bool "Xiaomi SM8150"
++	depends on ARCH_QCOM
++	select MACH_XIAOMI
++	help
++	  Support for Xiaomi SM8150 devices
++
++menu "Xiaomi board selection"
++
++config MACH_XIAOMI_ANDROMEDA
++	bool "Xiaomi andromeda board"
++	select MACH_XIAOMI_SM8150
++	help
++	  Support for Mi MIX 3 5G
++
++config MACH_XIAOMI_CEPHEUS
++	bool "Xiaomi cepheus board"
++	select MACH_XIAOMI_SM8150
++	help
++	  Support for Mi 9
++
++config MACH_XIAOMI_CRUX
++	bool "Xiaomi crux board"
++	select MACH_XIAOMI_SM8150
++	help
++	  Support for Mi 9 Pro 5G
++
++config MACH_XIAOMI_NABU
++	bool "Xiaomi nabu board"
++	select MACH_XIAOMI_SM8150
++	help
++	  Support for Xiaomi Pad 5
++
++config MACH_XIAOMI_RAPHAEL
++	bool "Xiaomi raphael board"
++	select MACH_XIAOMI_SM8150
++	help
++	  Support for Redmi K20 Pro/Mi 9T Pro
++
++config MACH_XIAOMI_VAYU
++	bool "Xiaomi vayu board"
++	select MACH_XIAOMI_SM8150
++	help
++	  Support for POCO X3 Pro
++
++endmenu
+-- 
+2.52.0
+

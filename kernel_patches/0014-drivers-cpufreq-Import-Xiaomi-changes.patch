@@ -1,0 +1,45 @@
+From f3439d23bc60041bbb5a2b954eaa7ceda0916738 Mon Sep 17 00:00:00 2001
+From: Sebastiano Barezzi <barezzisebastiano@gmail.com>
+Date: Wed, 22 Jun 2022 17:22:59 +0200
+Subject: [PATCH 014/115] drivers: cpufreq: Import Xiaomi changes
+
+Change-Id: Ic287243d1ea995dc014f1e57f828d2e5ac09f0f9
+---
+ drivers/cpufreq/cpufreq.c | 6 ++++++
+ include/linux/cpufreq.h   | 3 +++
+ 2 files changed, 9 insertions(+)
+
+diff --git a/drivers/cpufreq/cpufreq.c b/drivers/cpufreq/cpufreq.c
+index ea51a776c..a8ef00ab1 100644
+--- a/drivers/cpufreq/cpufreq.c
++++ b/drivers/cpufreq/cpufreq.c
+@@ -2267,6 +2267,12 @@ static int cpufreq_set_policy(struct cpufreq_policy *policy,
+ 	blocking_notifier_call_chain(&cpufreq_policy_notifier_list,
+ 			CPUFREQ_INCOMPATIBLE, new_policy);
+ 
++#ifdef CONFIG_MACH_XIAOMI_SM8150
++	/* the adjusted frequency should not exceed thermal limit */
++	blocking_notifier_call_chain(&cpufreq_policy_notifier_list,
++			CPUFREQ_THERMAL, new_policy);
++#endif
++
+ 	/*
+ 	 * verify the cpu speed can be set within this limit, which might be
+ 	 * different to the first one
+diff --git a/include/linux/cpufreq.h b/include/linux/cpufreq.h
+index ed0ff1538..f1ca2468f 100644
+--- a/include/linux/cpufreq.h
++++ b/include/linux/cpufreq.h
+@@ -429,6 +429,9 @@ static inline void cpufreq_resume(void) {}
+ /* Policy Notifiers  */
+ #define CPUFREQ_ADJUST			(0)
+ #define CPUFREQ_NOTIFY			(1)
++#ifdef CONFIG_MACH_XIAOMI_SM8150
++#define CPUFREQ_THERMAL			(2)
++#endif
+ #define CPUFREQ_INCOMPATIBLE	(6)
+ 
+ #ifdef CONFIG_CPU_FREQ
+-- 
+2.52.0
+

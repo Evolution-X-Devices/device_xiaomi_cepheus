@@ -1,0 +1,37 @@
+From 501e7286ba8508791c3eb69ca24f63fa0ccd92c6 Mon Sep 17 00:00:00 2001
+From: Sebastiano Barezzi <barezzisebastiano@gmail.com>
+Date: Wed, 22 Jun 2022 19:32:27 +0200
+Subject: [PATCH 087/115] drivers: regulator: Import Xiaomi changes
+
+Change-Id: Icbe3bfb4f35f9c7d0c7b04eeb2bbf0c53d31e4cd
+---
+ drivers/regulator/qpnp-lcdb-regulator.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
+
+diff --git a/drivers/regulator/qpnp-lcdb-regulator.c b/drivers/regulator/qpnp-lcdb-regulator.c
+index 396ed5415..a4c130279 100644
+--- a/drivers/regulator/qpnp-lcdb-regulator.c
++++ b/drivers/regulator/qpnp-lcdb-regulator.c
+@@ -1283,6 +1283,19 @@ static int qpnp_lcdb_get_voltage(struct qpnp_lcdb *lcdb,
+ 		return rc;
+ 	}
+ 
++#ifdef CONFIG_MACH_XIAOMI_SM8150
++	if ((val & 0x80) && (type == NCP))//NCP follow 0x71 LDO
++	{
++		offset = LCDB_LDO_OUTPUT_VOLTAGE_REG;
++
++		rc = qpnp_lcdb_read(lcdb, lcdb->base + offset, &val, 1);
++		if (rc < 0) {
++			pr_err("Failed to read NCP volatge rc=%d\n", rc);
++			return rc;
++		}
++	}
++#endif
++
+ 	val &= SET_OUTPUT_VOLTAGE_MASK;
+ 	if (val < VOLTAGE_STEP_50MV_OFFSET) {
+ 		*voltage_mv = VOLTAGE_MIN_STEP_100_MV +
+-- 
+2.52.0
+

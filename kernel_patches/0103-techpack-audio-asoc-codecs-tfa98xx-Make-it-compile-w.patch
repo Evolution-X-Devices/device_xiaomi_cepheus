@@ -1,0 +1,50 @@
+From 513574060e4c07eb62faf6c80c43a5a41a09fa38 Mon Sep 17 00:00:00 2001
+From: Sebastiano Barezzi <seba@sebaubuntu.dev>
+Date: Sun, 9 Jun 2024 19:19:36 +0200
+Subject: [PATCH 103/115] techpack: audio: asoc: codecs: tfa98xx: Make it
+ compile without debugfs
+
+Change-Id: Ia04686616f8f2b0b5fa5eb810025811970d624d5
+---
+ .../audio/asoc/codecs/tfa98xx/src/tfa98xx.c    | 18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
+
+diff --git a/techpack/audio/asoc/codecs/tfa98xx/src/tfa98xx.c b/techpack/audio/asoc/codecs/tfa98xx/src/tfa98xx.c
+index f66ad2449..384d2e54b 100644
+--- a/techpack/audio/asoc/codecs/tfa98xx/src/tfa98xx.c
++++ b/techpack/audio/asoc/codecs/tfa98xx/src/tfa98xx.c
+@@ -404,6 +404,15 @@ static void tfa98xx_inputdev_unregister(struct tfa98xx *tfa98xx)
+ 	__tfa98xx_inputdev_check_register(tfa98xx, true);
+ }
+ 
++#ifdef TFA_NON_DSP_SOLUTION
++extern int send_tfa_cal_apr(void *buf, int cmd_size, bool bRead);
++#else
++int send_tfa_cal_apr(void *buf, int cmd_size, bool bRead)
++{
++	return 0;
++}
++#endif
++
+ #ifdef CONFIG_DEBUG_FS
+ /* OTC reporting
+  * Returns the MTP0 OTC bit value
+@@ -765,15 +774,6 @@ static ssize_t tfa98xx_dbgfs_fw_state_get(struct file *file,
+ 	return simple_read_from_buffer(user_buf, count, ppos, str, strlen(str));
+ }
+ 
+-#ifdef TFA_NON_DSP_SOLUTION
+-extern int send_tfa_cal_apr(void *buf, int cmd_size, bool bRead);
+-#else
+-int send_tfa_cal_apr(void *buf, int cmd_size, bool bRead)
+-{
+-	return 0;
+-}
+-#endif
+-
+ static ssize_t tfa98xx_dbgfs_rpc_read(struct file *file, char __user *user_buf,
+ 				      size_t count, loff_t *ppos)
+ {
+-- 
+2.52.0
+

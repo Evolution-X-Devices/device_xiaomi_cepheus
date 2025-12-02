@@ -1,0 +1,61 @@
+From ae53e3951433ca1c14da0d361ffa260e45b063d2 Mon Sep 17 00:00:00 2001
+From: Sebastiano Barezzi <seba@sebaubuntu.dev>
+Date: Mon, 6 Nov 2023 00:56:55 +0100
+Subject: [PATCH 007/115] arch: arm64: configs: xiaomi: Enable device-specific
+ platform
+
+Change-Id: Iadb079c5f1d654226276dd1d316e324968fa1e92
+---
+ arch/arm64/configs/vendor/xiaomi/andromeda.config | 2 ++
+ arch/arm64/configs/vendor/xiaomi/cepheus.config   | 2 ++
+ arch/arm64/configs/vendor/xiaomi/crux.config      | 2 ++
+ arch/arm64/configs/vendor/xiaomi/nabu.config      | 2 ++
+ arch/arm64/configs/vendor/xiaomi/raphael.config   | 2 ++
+ arch/arm64/configs/vendor/xiaomi/vayu.config      | 2 ++
+ 6 files changed, 12 insertions(+)
+
+diff --git a/arch/arm64/configs/vendor/xiaomi/andromeda.config b/arch/arm64/configs/vendor/xiaomi/andromeda.config
+index e69de29bb..6981d0473 100644
+--- a/arch/arm64/configs/vendor/xiaomi/andromeda.config
++++ b/arch/arm64/configs/vendor/xiaomi/andromeda.config
+@@ -0,0 +1,2 @@
++# Platform
++CONFIG_MACH_XIAOMI_ANDROMEDA=y
+diff --git a/arch/arm64/configs/vendor/xiaomi/cepheus.config b/arch/arm64/configs/vendor/xiaomi/cepheus.config
+index e69de29bb..b237760c4 100644
+--- a/arch/arm64/configs/vendor/xiaomi/cepheus.config
++++ b/arch/arm64/configs/vendor/xiaomi/cepheus.config
+@@ -0,0 +1,2 @@
++# Platform
++CONFIG_MACH_XIAOMI_CEPHEUS=y
+diff --git a/arch/arm64/configs/vendor/xiaomi/crux.config b/arch/arm64/configs/vendor/xiaomi/crux.config
+index e69de29bb..0611ff82c 100644
+--- a/arch/arm64/configs/vendor/xiaomi/crux.config
++++ b/arch/arm64/configs/vendor/xiaomi/crux.config
+@@ -0,0 +1,2 @@
++# Platform
++CONFIG_MACH_XIAOMI_CRUX=y
+diff --git a/arch/arm64/configs/vendor/xiaomi/nabu.config b/arch/arm64/configs/vendor/xiaomi/nabu.config
+index e69de29bb..39bd6a435 100644
+--- a/arch/arm64/configs/vendor/xiaomi/nabu.config
++++ b/arch/arm64/configs/vendor/xiaomi/nabu.config
+@@ -0,0 +1,2 @@
++# Platform
++CONFIG_MACH_XIAOMI_NABU=y
+diff --git a/arch/arm64/configs/vendor/xiaomi/raphael.config b/arch/arm64/configs/vendor/xiaomi/raphael.config
+index e69de29bb..89de85dcf 100644
+--- a/arch/arm64/configs/vendor/xiaomi/raphael.config
++++ b/arch/arm64/configs/vendor/xiaomi/raphael.config
+@@ -0,0 +1,2 @@
++# Platform
++CONFIG_MACH_XIAOMI_RAPHAEL=y
+diff --git a/arch/arm64/configs/vendor/xiaomi/vayu.config b/arch/arm64/configs/vendor/xiaomi/vayu.config
+index e69de29bb..96c16e9b2 100644
+--- a/arch/arm64/configs/vendor/xiaomi/vayu.config
++++ b/arch/arm64/configs/vendor/xiaomi/vayu.config
+@@ -0,0 +1,2 @@
++# Platform
++CONFIG_MACH_XIAOMI_VAYU=y
+-- 
+2.52.0
+

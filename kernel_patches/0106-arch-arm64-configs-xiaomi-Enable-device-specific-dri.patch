@@ -1,0 +1,230 @@
+From d7170ea594812240dac0a536de1ce1394cb42c81 Mon Sep 17 00:00:00 2001
+From: Sebastiano Barezzi <seba@sebaubuntu.dev>
+Date: Sat, 18 Nov 2023 14:54:27 +0100
+Subject: [PATCH 106/115] arch: arm64: configs: xiaomi: Enable device-specific
+ drivers
+
+Change-Id: I4dd54e21df54f5a104e8d86c0b0aab3baf0f382c
+---
+ .../configs/vendor/xiaomi/andromeda.config    | 13 ++++
+ .../configs/vendor/xiaomi/cepheus.config      | 16 ++++
+ arch/arm64/configs/vendor/xiaomi/crux.config  | 19 +++++
+ arch/arm64/configs/vendor/xiaomi/nabu.config  | 15 ++++
+ .../configs/vendor/xiaomi/raphael.config      |  7 ++
+ .../vendor/xiaomi/sm8150-common.config        | 77 +++++++++++++++++++
+ arch/arm64/configs/vendor/xiaomi/vayu.config  | 13 ++++
+ 7 files changed, 160 insertions(+)
+
+diff --git a/arch/arm64/configs/vendor/xiaomi/andromeda.config b/arch/arm64/configs/vendor/xiaomi/andromeda.config
+index 6981d0473..501339f6e 100644
+--- a/arch/arm64/configs/vendor/xiaomi/andromeda.config
++++ b/arch/arm64/configs/vendor/xiaomi/andromeda.config
+@@ -1,2 +1,15 @@
+ # Platform
+ CONFIG_MACH_XIAOMI_ANDROMEDA=y
++
++# Audio
++CONFIG_SND_SOC_CS35L41=y
++CONFIG_MSM_CSPL=y
++
++# Camera
++CONFIG_USE_ROHM_BU64753=y
++
++# Touchscreen
++CONFIG_TOUCHSCREEN_ST_FTS_V521=y
++CONFIG_FTS_FOD_AREA_REPORT=y
++CONFIG_SECURE_TOUCH=y
++CONFIG_I2C_BY_DMA=y
+diff --git a/arch/arm64/configs/vendor/xiaomi/cepheus.config b/arch/arm64/configs/vendor/xiaomi/cepheus.config
+index b237760c4..600752df9 100644
+--- a/arch/arm64/configs/vendor/xiaomi/cepheus.config
++++ b/arch/arm64/configs/vendor/xiaomi/cepheus.config
+@@ -1,2 +1,18 @@
+ # Platform
+ CONFIG_MACH_XIAOMI_CEPHEUS=y
++
++# Audio
++CONFIG_SND_SOC_CS35L41=y
++CONFIG_MSM_CSPL=y
++
++# Camera
++CONFIG_VCM_AK7374=y
++
++# Power
++CONFIG_IDT_P9220=y
++
++# Touchscreen
++CONFIG_TOUCHSCREEN_ST_FTS_V521=y
++CONFIG_FTS_FOD_AREA_REPORT=y
++CONFIG_SECURE_TOUCH=y
++CONFIG_I2C_BY_DMA=y
+diff --git a/arch/arm64/configs/vendor/xiaomi/crux.config b/arch/arm64/configs/vendor/xiaomi/crux.config
+index 0611ff82c..9b0be13a4 100644
+--- a/arch/arm64/configs/vendor/xiaomi/crux.config
++++ b/arch/arm64/configs/vendor/xiaomi/crux.config
+@@ -1,2 +1,21 @@
+ # Platform
+ CONFIG_MACH_XIAOMI_CRUX=y
++
++# Audio
++CONFIG_SND_SOC_CS35L41=y
++CONFIG_MSM_CSPL=y
++
++# Camera
++CONFIG_USE_ROHM_BU64753=y
++CONFIG_VCM_AK7374=y
++
++# Power
++CONFIG_RX1619=y
++CONFIG_RX1619_TRIM=y
++CONFIG_LN8282=y
++CONFIG_IDT_P9220=y
++CONFIG_HALO_7221=y
++
++# Touchscreen
++CONFIG_TOUCHSCREEN_ST_FTS_V521=y
++CONFIG_FTS_FOD_AREA_REPORT=y
+diff --git a/arch/arm64/configs/vendor/xiaomi/nabu.config b/arch/arm64/configs/vendor/xiaomi/nabu.config
+index 39bd6a435..cea941345 100644
+--- a/arch/arm64/configs/vendor/xiaomi/nabu.config
++++ b/arch/arm64/configs/vendor/xiaomi/nabu.config
+@@ -1,2 +1,17 @@
+ # Platform
+ CONFIG_MACH_XIAOMI_NABU=y
++
++# Audio
++CONFIG_SND_SOC_CS35L41_V2=y
++CONFIG_MSM_CSPL_V2=y
++
++# Power
++CONFIG_BATT_VERIFY_BY_DS28E16_NABU=y
++CONFIG_ONEWIRE_GPIO_NABU=y
++CONFIG_IDT_P9418=y
++CONFIG_BQ2597X_CHARGE_PUMP=y
++CONFIG_CHARGER_LN8000=y
++
++# Touchscreen
++CONFIG_TOUCHSCREEN_NT36523_HOSTDL_SPI=y
++CONFIG_TOUCHSCREEN_NVT_DEBUG_FS=y
+diff --git a/arch/arm64/configs/vendor/xiaomi/raphael.config b/arch/arm64/configs/vendor/xiaomi/raphael.config
+index 89de85dcf..a8db1f76d 100644
+--- a/arch/arm64/configs/vendor/xiaomi/raphael.config
++++ b/arch/arm64/configs/vendor/xiaomi/raphael.config
+@@ -1,2 +1,9 @@
+ # Platform
+ CONFIG_MACH_XIAOMI_RAPHAEL=y
++
++# Audio
++CONFIG_SND_SOC_CS35L41=y
++CONFIG_MSM_CSPL=y
++
++# Touchscreen
++CONFIG_TOUCHSCREEN_GOODIX_GTX8=y
+diff --git a/arch/arm64/configs/vendor/xiaomi/sm8150-common.config b/arch/arm64/configs/vendor/xiaomi/sm8150-common.config
+index 78436de13..610d5f699 100644
+--- a/arch/arm64/configs/vendor/xiaomi/sm8150-common.config
++++ b/arch/arm64/configs/vendor/xiaomi/sm8150-common.config
+@@ -9,3 +9,80 @@ CONFIG_EXFAT_FS=y
+ 
+ # EROFS
+ CONFIG_EROFS_FS=y
++
++# pstore
++CONFIG_CMDLINE="ramoops_memreserve=4M"
++CONFIG_CMDLINE_EXTEND=y
++CONFIG_PSTORE=y
++CONFIG_PSTORE_CONSOLE=y
++CONFIG_PSTORE_PMSG=y
++CONFIG_PSTORE_RAM=y
++CONFIG_BLK_WBT=y
++CONFIG_BLK_WBT_SQ=y
++CONFIG_MTD=y
++CONFIG_MTD_BLOCK=y
++CONFIG_MTD_OOPS=y
++CONFIG_MTD_BLOCK2MTD=y
++
++# Audio
++CONFIG_SND_SOC_TAS256X=y
++CONFIG_TAS256X_CODEC=y
++CONFIG_TAS256X_REGMAP=y
++CONFIG_TAS25XX_ALGO=y
++CONFIG_SND_SOC_TAS2557=y
++CONFIG_TAS2557_REGMAP=y
++CONFIG_TAS2557_CODEC=y
++CONFIG_TAS2557_MISC=y
++CONFIG_SND_SOC_TFA9874=y
++
++# Backlight
++CONFIG_BACKLIGHT_LCD_SUPPORT=y
++CONFIG_BACKLIGHT_CLASS_DEVICE=y
++CONFIG_BACKLIGHT_KTZ8866=y
++
++# Camera motor
++CONFIG_TI_DRV8846=y
++
++# Fingerprint
++CONFIG_INPUT_FINGERPRINT=y
++CONFIG_FINGERPRINT_FPC_TEE=y
++CONFIG_FINGERPRINT_GOODIX_TA=y
++
++# Haptics
++CONFIG_INPUT_AW8697_XM_HAPTIC=y
++
++# IR
++CONFIG_IR_SPI=y
++CONFIG_LIRC=y
++CONFIG_RC_CORE=y
++CONFIG_RC_DECODERS=y
++CONFIG_MEDIA_RC_SUPPORT=y
++CONFIG_RC_DEVICES=y
++
++# Keyboard
++CONFIG_XIAOMI_KEYBOARD=y
++
++# Power
++# CONFIG_SMB1355_SLAVE_CHARGER is not set
++# CONFIG_SMB1390_CHARGE_PUMP_PSY is not set
++CONFIG_SMB1390_CHARGE_PUMP=y
++CONFIG_FRAME_WARN=4096
++
++# Proximity
++CONFIG_US_PROXIMITY=y
++
++# Sensors
++CONFIG_AKM09970=y
++
++# Simtray
++CONFIG_SIMTRAY_STATUS=y
++
++# spk-id
++CONFIG_HAS_IOMEM=y
++CONFIG_MFD_SPK_ID=y
++
++# TEE
++CONFIG_TRUSTY=y
++
++# Touchscreen
++# CONFIG_TOUCHSCREEN_ST is not set
+diff --git a/arch/arm64/configs/vendor/xiaomi/vayu.config b/arch/arm64/configs/vendor/xiaomi/vayu.config
+index 96c16e9b2..a3342fc69 100644
+--- a/arch/arm64/configs/vendor/xiaomi/vayu.config
++++ b/arch/arm64/configs/vendor/xiaomi/vayu.config
+@@ -1,2 +1,15 @@
+ # Platform
+ CONFIG_MACH_XIAOMI_VAYU=y
++
++# Audio
++CONFIG_SND_SOC_CS35L41=y
++CONFIG_MSM_CSPL=y
++
++# Power
++CONFIG_BATT_VERIFY_BY_DS28E16=y
++CONFIG_ONEWIRE_GPIO=y
++CONFIG_BQ2597X_CHARGE_PUMP=y
++
++# Touchscreen
++CONFIG_TOUCHSCREEN_NT36xxx_HOSTDL_SPI=y
++CONFIG_TOUCHSCREEN_NVT_DEBUG_FS=y
+-- 
+2.52.0
+

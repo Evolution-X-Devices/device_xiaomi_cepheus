@@ -1,0 +1,47 @@
+From 0eea990d9e472fb7f68fb7a417cb5d526d300789 Mon Sep 17 00:00:00 2001
+From: Sebastiano Barezzi <barezzisebastiano@gmail.com>
+Date: Wed, 22 Jun 2022 19:01:55 +0200
+Subject: [PATCH 081/115] drivers: of: Import Xiaomi changes
+
+Change-Id: I816c5168b4e419ca32a0b8a0d22f6738676eb86f
+---
+ drivers/of/of_batterydata.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
+
+diff --git a/drivers/of/of_batterydata.c b/drivers/of/of_batterydata.c
+index b275a8c0a..0aff4632b 100644
+--- a/drivers/of/of_batterydata.c
++++ b/drivers/of/of_batterydata.c
+@@ -321,6 +321,9 @@ struct device_node *of_batterydata_get_best_profile(
+ {
+ 	struct batt_ids batt_ids;
+ 	struct device_node *node, *best_node = NULL;
++#ifdef CONFIG_MACH_XIAOMI_SM8150
++	struct device_node *generic_node = NULL;
++#endif
+ 	const char *battery_type = NULL;
+ 	int delta = 0, best_delta = 0, best_id_kohm = 0, id_range_pct,
+ 		i = 0, rc = 0, limit = 0;
+@@ -374,9 +377,19 @@ struct device_node *of_batterydata_get_best_profile(
+ 				}
+ 			}
+ 		}
++
++#ifdef CONFIG_MACH_XIAOMI_SM8150
++		rc = of_property_read_string(node, "qcom,battery-type",
++						&battery_type);
++		if (!rc && strcmp(battery_type, "itech_3000mah") == 0)
++			generic_node = node;
++#endif
+ 	}
+ 
+ 	if (best_node == NULL) {
++#ifdef CONFIG_MACH_XIAOMI_SM8150
++		best_node = generic_node;
++#endif
+ 		pr_err("No battery data found\n");
+ 		return best_node;
+ 	}
+-- 
+2.52.0
+

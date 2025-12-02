@@ -1,0 +1,70 @@
+From 4777789079154785cab24c304e06cf5ab40f79c1 Mon Sep 17 00:00:00 2001
+From: Sebastiano Barezzi <seba@sebaubuntu.dev>
+Date: Mon, 6 Nov 2023 12:57:40 +0100
+Subject: [PATCH 099/115] techpack: audio: Allow ASoC codecs selection through
+ Kconfig
+
+* Not every device may want all the additional codecs from OEM,
+  especially on common kernel sources with a lot of codecs
+
+Change-Id: I1521f714c90e74f1f674495bee312e28e55cf87a
+---
+ techpack/Kconfig                   | 2 ++
+ techpack/audio/Kconfig             | 2 ++
+ techpack/audio/asoc/Kconfig        | 1 +
+ techpack/audio/asoc/codecs/Kconfig | 3 +++
+ techpack/audio/dsp/Kconfig         | 3 +++
+ 5 files changed, 11 insertions(+)
+ create mode 100644 techpack/audio/Kconfig
+ create mode 100644 techpack/audio/asoc/Kconfig
+ create mode 100644 techpack/audio/asoc/codecs/Kconfig
+ create mode 100644 techpack/audio/dsp/Kconfig
+
+diff --git a/techpack/Kconfig b/techpack/Kconfig
+index b3c5013ad..9f07eebc0 100644
+--- a/techpack/Kconfig
++++ b/techpack/Kconfig
+@@ -1,5 +1,7 @@
+ menu "Tech packages"
+ 
++source "techpack/audio/Kconfig"
++
+ source "techpack/data/Kconfig"
+ 
+ endmenu
+diff --git a/techpack/audio/Kconfig b/techpack/audio/Kconfig
+new file mode 100644
+index 000000000..0fd02b6a7
+--- /dev/null
++++ b/techpack/audio/Kconfig
+@@ -0,0 +1,2 @@
++source "techpack/audio/asoc/Kconfig"
++source "techpack/audio/dsp/Kconfig"
+diff --git a/techpack/audio/asoc/Kconfig b/techpack/audio/asoc/Kconfig
+new file mode 100644
+index 000000000..335df2d0d
+--- /dev/null
++++ b/techpack/audio/asoc/Kconfig
+@@ -0,0 +1 @@
++source "techpack/audio/asoc/codecs/Kconfig"
+diff --git a/techpack/audio/asoc/codecs/Kconfig b/techpack/audio/asoc/codecs/Kconfig
+new file mode 100644
+index 000000000..6fbac4e91
+--- /dev/null
++++ b/techpack/audio/asoc/codecs/Kconfig
+@@ -0,0 +1,3 @@
++menu "Qualcomm ASoC additional codecs"
++
++endmenu
+diff --git a/techpack/audio/dsp/Kconfig b/techpack/audio/dsp/Kconfig
+new file mode 100644
+index 000000000..9d6601d1e
+--- /dev/null
++++ b/techpack/audio/dsp/Kconfig
+@@ -0,0 +1,3 @@
++menu "Qualcomm DSP"
++
++endmenu
+-- 
+2.52.0
+

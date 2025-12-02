@@ -1,0 +1,36 @@
+From 1579e10cf02f09f4a061c987f76eb55868c4e1b4 Mon Sep 17 00:00:00 2001
+From: Sebastiano Barezzi <seba@sebaubuntu.dev>
+Date: Wed, 28 Aug 2024 17:04:14 +0200
+Subject: [PATCH 075/115] arch: arm64: boot: dts: qcom: xiaomi: Adapt IR SPI
+ binding for upstream driver
+
+Change-Id: I9002f2e8d3a214195fe6131cc38d2a09e4c4c6f2
+---
+ arch/arm64/boot/dts/qcom/xiaomi/overlay/common/ir.dtsi | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm64/boot/dts/qcom/xiaomi/overlay/common/ir.dtsi b/arch/arm64/boot/dts/qcom/xiaomi/overlay/common/ir.dtsi
+index e7c91aa56..538d11a8b 100644
+--- a/arch/arm64/boot/dts/qcom/xiaomi/overlay/common/ir.dtsi
++++ b/arch/arm64/boot/dts/qcom/xiaomi/overlay/common/ir.dtsi
+@@ -1,8 +1,16 @@
++&soc {
++	irda_regulator: irda-regulator {
++		compatible = "regulator-dummy";
++		regulator-name = "irda_regulator";
++	};
++};
++
+ &qupv3_se1_spi {
+ 	status = "ok";
+ 	irled@0 {
+-		compatible = "ir-spi";
++		compatible = "ir-spi-led";
+ 		reg = <0x0>;
++		power-supply = <&irda_regulator>;
+ 		status = "ok";
+ 		spi-max-frequency = <19200000>;
+ 	};
+-- 
+2.52.0
+

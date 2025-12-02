@@ -1,0 +1,28 @@
+From f2a065a377ad3d25953a9d156a129c10ac1b7c3b Mon Sep 17 00:00:00 2001
+From: Sebastiano Barezzi <barezzisebastiano@gmail.com>
+Date: Tue, 28 Jun 2022 23:14:51 +0200
+Subject: [PATCH 109/115] arch: arm64: configs: xiaomi: Enable
+ CONFIG_INITRAMFS_IGNORE_SKIP_FLAG
+
+Change-Id: I22b5eb981c886d9280957f6bd1047fc76ac9916b
+---
+ arch/arm64/configs/vendor/xiaomi/sm8150-common.config | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/arch/arm64/configs/vendor/xiaomi/sm8150-common.config b/arch/arm64/configs/vendor/xiaomi/sm8150-common.config
+index 610d5f699..942ae66bd 100644
+--- a/arch/arm64/configs/vendor/xiaomi/sm8150-common.config
++++ b/arch/arm64/configs/vendor/xiaomi/sm8150-common.config
+@@ -10,6 +10,9 @@ CONFIG_EXFAT_FS=y
+ # EROFS
+ CONFIG_EROFS_FS=y
+ 
++# initramfs
++CONFIG_INITRAMFS_IGNORE_SKIP_FLAG=y
++
+ # pstore
+ CONFIG_CMDLINE="ramoops_memreserve=4M"
+ CONFIG_CMDLINE_EXTEND=y
+-- 
+2.52.0
+

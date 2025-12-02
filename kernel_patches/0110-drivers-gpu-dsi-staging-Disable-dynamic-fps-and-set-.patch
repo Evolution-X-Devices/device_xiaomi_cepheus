@@ -1,0 +1,78 @@
+From 7fb12609dd9ca573cbac02c8764344c1d9a6661c Mon Sep 17 00:00:00 2001
+From: map220v <map220v300@gmail.com>
+Date: Wed, 31 May 2023 18:37:30 +0300
+Subject: [PATCH 110/115] drivers: gpu: dsi-staging: Disable dynamic fps and
+ set refresh rate to 104
+
+* Fixes issue with drm render in recovery and charger
+
+[SebaUbuntu]: Don't export the symbols, guard for nabu only
+
+Co-authored-by: Cyber Knight <cyberknight755@gmail.com>
+Change-Id: Ibff4d92d054c302b75e6a2bf7ddaf0e88f1fa43f
+---
+ drivers/gpu/drm/msm/dsi-staging/dsi_panel.c | 34 +++++++++++++++++++++
+ 1 file changed, 34 insertions(+)
+
+diff --git a/drivers/gpu/drm/msm/dsi-staging/dsi_panel.c b/drivers/gpu/drm/msm/dsi-staging/dsi_panel.c
+index 252476bd5..d8991845d 100644
+--- a/drivers/gpu/drm/msm/dsi-staging/dsi_panel.c
++++ b/drivers/gpu/drm/msm/dsi-staging/dsi_panel.c
+@@ -49,6 +49,26 @@
+ #define DEFAULT_PANEL_PREFILL_LINES	25
+ #define TICKS_IN_MICRO_SECOND		1000000
+ 
++#ifdef CONFIG_MACH_XIAOMI_NABU
++static bool is_normal_boot = false;
++static int __init read_is_normal_boot(char *s)
++{
++    strtobool(s, &is_normal_boot);
++    return 1;
++}
++__setup("androidboot.force_normal_boot=", read_is_normal_boot);
++
++static bool is_charger_boot = false;
++static int __init read_boot_mode(char *s)
++{
++    if (strcmp(s, "charger") == 0) {
++        is_charger_boot = true;
++    }
++    return 1;
++}
++__setup("androidboot.mode=", read_boot_mode);
++#endif
++
+ enum dsi_dsc_ratio_type {
+ 	DSC_8BPC_8BPP,
+ 	DSC_10BPC_8BPP,
+@@ -1347,6 +1367,13 @@ static int dsi_panel_parse_timing(struct dsi_mode_info *mode,
+ 	rc = utils->read_u32(utils->data,
+ 				"qcom,mdss-dsi-panel-framerate",
+ 				&mode->refresh_rate);
++
++#ifdef CONFIG_MACH_XIAOMI_NABU
++    if (!is_normal_boot || is_charger_boot) {
++		mode->refresh_rate = 104;
++    }
++#endif
++                
+ 	if (rc) {
+ 		pr_err("failed to read qcom,mdss-dsi-panel-framerate, rc=%d\n",
+ 		       rc);
+@@ -1899,6 +1926,13 @@ static int dsi_panel_parse_dfps_caps(struct dsi_panel *panel)
+ 	const char *type;
+ 	u32 i;
+ 
++#ifdef CONFIG_MACH_XIAOMI_NABU
++    if (!is_normal_boot || is_charger_boot) {
++		dfps_caps->dfps_support = false;
++		return rc;
++    }
++#endif
++
+ 	supported = utils->read_bool(utils->data,
+ 			"qcom,mdss-dsi-pan-enable-dynamic-fps");
+ 
+-- 
+2.52.0
+

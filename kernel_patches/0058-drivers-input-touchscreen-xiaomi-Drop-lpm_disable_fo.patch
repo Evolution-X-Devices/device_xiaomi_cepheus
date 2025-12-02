@@ -1,0 +1,213 @@
+From e945e6d7ddf0c67b687023db1c7e48784bf9e26c Mon Sep 17 00:00:00 2001
+From: Sebastiano Barezzi <seba@sebaubuntu.dev>
+Date: Sun, 28 Jan 2024 03:09:02 +0100
+Subject: [PATCH 058/115] drivers: input: touchscreen: xiaomi: Drop
+ lpm_disable_for_input
+
+Change-Id: I3b8c72c63dc3e20c00e54ef28925126345075a38
+---
+ drivers/input/touchscreen/xiaomi/fts_521/fts.c  | 10 ----------
+ .../input/touchscreen/xiaomi/nt36523/nt36xxx.c  |  6 ------
+ .../input/touchscreen/xiaomi/nt36672c/nt36xxx.c | 17 -----------------
+ 3 files changed, 33 deletions(-)
+
+diff --git a/drivers/input/touchscreen/xiaomi/fts_521/fts.c b/drivers/input/touchscreen/xiaomi/fts_521/fts.c
+index 965d0214e..d5fa0b5ec 100644
+--- a/drivers/input/touchscreen/xiaomi/fts_521/fts.c
++++ b/drivers/input/touchscreen/xiaomi/fts_521/fts.c
+@@ -150,7 +150,6 @@ static int fts_mode_handler(struct fts_ts_info *info, int force);
+ static int fts_chip_initialization(struct fts_ts_info *info, int init_type);
+ static const char *fts_get_limit(struct fts_ts_info *info);
+ static irqreturn_t fts_event_handler(int irq, void *ts_info);
+-extern void lpm_disable_for_input(bool on);
+ 
+ /**
+ * Release all the touches in the linux input subsystem
+@@ -181,7 +180,6 @@ void release_all_touches(struct fts_ts_info *info)
+ #ifdef STYLUS_MODE
+ 	info->stylus_id = 0;
+ #endif
+-	lpm_disable_for_input(false);
+ }
+ 
+ /**
+@@ -3395,7 +3393,6 @@ static void fts_leave_pointer_event_handler(struct fts_ts_info *info,
+ 	input_mt_report_slot_state(info->input_dev, tool, 0);
+ 	if (info->touch_id == 0) {
+ 		input_report_key(info->input_dev, BTN_TOUCH, touch_condition);
+-		lpm_disable_for_input(false);
+ 		if (!touch_condition)
+ 			input_report_key(info->input_dev, BTN_TOOL_FINGER, 0);
+ #ifdef CONFIG_FTS_FOD_AREA_REPORT
+@@ -4116,7 +4113,6 @@ static void fts_ts_sleep_work(struct work_struct *work)
+ 				tag);
+ 			pm_relax(info->dev);
+ 			fts_enableInterrupt();
+-			lpm_disable_for_input(false);
+ 			return;
+ 		} else {
+ 			logError(
+@@ -4176,7 +4172,6 @@ static void fts_ts_sleep_work(struct work_struct *work)
+ #endif
+ 	pm_relax(info->dev);
+ 	fts_enableInterrupt();
+-	lpm_disable_for_input(false);
+ 	return;
+ }
+ 
+@@ -4214,8 +4209,6 @@ static irqreturn_t fts_event_handler(int irq, void *ts_info)
+ 		return IRQ_HANDLED;
+ 	}
+ #endif
+-	lpm_disable_for_input(true);
+-
+ 	info->irq_status = true;
+ 	error = fts_writeReadU8UX(regAdd, 0, 0, data, FIFO_EVENT_SIZE,
+ 				  DUMMY_FIFO);
+@@ -4261,8 +4254,6 @@ static irqreturn_t fts_event_handler(int irq, void *ts_info)
+ 	}
+ 	input_sync(info->input_dev);
+ 	info->irq_status = false;
+-	if (!info->touch_id)
+-		lpm_disable_for_input(false);
+ #ifdef CONFIG_TOUCHSCREEN_XIAOMI_TOUCHFEATURE
+ 	wake_up(&info->wait_queue);
+ #endif
+@@ -5778,7 +5769,6 @@ static void fts_suspend_work(struct work_struct *work)
+ 	sysfs_notify(&fts_info->fts_touch_dev->kobj, NULL,
+ 		     "touch_suspend_notify");
+ #endif
+-	lpm_disable_for_input(false);
+ }
+ 
+ #ifdef CONFIG_DRM
+diff --git a/drivers/input/touchscreen/xiaomi/nt36523/nt36xxx.c b/drivers/input/touchscreen/xiaomi/nt36523/nt36xxx.c
+index 4e1bdb5f4..914e1598d 100644
+--- a/drivers/input/touchscreen/xiaomi/nt36523/nt36xxx.c
++++ b/drivers/input/touchscreen/xiaomi/nt36523/nt36xxx.c
+@@ -89,7 +89,6 @@ static int32_t nvt_ts_suspend(struct device *dev);
+ static int32_t nvt_ts_resume(struct device *dev);
+ extern int dsi_panel_lockdown_info_read(unsigned char *plockdowninfo);
+ extern void dsi_panel_doubleclick_enable(bool on);
+-extern void lpm_disable_for_input(bool on);
+ extern int pen_charge_state_notifier_register_client(struct notifier_block *nb);
+ extern int
+ pen_charge_state_notifier_unregister_client(struct notifier_block *nb);
+@@ -1663,8 +1662,6 @@ static irqreturn_t nvt_ts_work_func(int irq, void *data)
+ 	}
+ #endif
+ 
+-	lpm_disable_for_input(true);
+-
+ 	mutex_lock(&ts->lock);
+ 
+ 	if (ts->dev_pm_suspend) {
+@@ -1672,7 +1669,6 @@ static irqreturn_t nvt_ts_work_func(int irq, void *data)
+ 			&ts->dev_pm_suspend_completion, msecs_to_jiffies(500));
+ 		if (!ret) {
+ 			NVT_ERR("system(spi) can't finished resuming procedure, skip it\n");
+-			lpm_disable_for_input(false);
+ 			goto XFER_ERROR;
+ 		}
+ 	}
+@@ -1738,7 +1734,6 @@ static irqreturn_t nvt_ts_work_func(int irq, void *data)
+ 		input_id = (uint8_t)(point_data[1] >> 3);
+ 		nvt_ts_wakeup_gesture_report(input_id, point_data);
+ 		mutex_unlock(&ts->lock);
+-		lpm_disable_for_input(false);
+ 		return IRQ_HANDLED;
+ 	}
+ #endif
+@@ -1929,7 +1924,6 @@ static irqreturn_t nvt_ts_work_func(int irq, void *data)
+ XFER_ERROR:
+ 
+ 	mutex_unlock(&ts->lock);
+-	lpm_disable_for_input(false);
+ 	return IRQ_HANDLED;
+ }
+ 
+diff --git a/drivers/input/touchscreen/xiaomi/nt36672c/nt36xxx.c b/drivers/input/touchscreen/xiaomi/nt36672c/nt36xxx.c
+index 93ba8565e..17eb850be 100644
+--- a/drivers/input/touchscreen/xiaomi/nt36672c/nt36xxx.c
++++ b/drivers/input/touchscreen/xiaomi/nt36672c/nt36xxx.c
+@@ -97,7 +97,6 @@ extern void dsi_panel_doubleclick_enable(bool on);
+ #ifdef CONFIG_TOUCHSCREEN_XIAOMI_TOUCHFEATURE
+ static int32_t nvt_check_palm(uint8_t input_id, uint8_t *data);
+ #endif
+-extern void lpm_disable_for_input(bool on);
+ uint32_t ENG_RST_ADDR = 0x7FFF80;
+ uint32_t SWRST_N8_ADDR = 0; /* read from dtsi */
+ uint32_t SPI_RD_FAST_ADDR = 0; /* read from dtsi */
+@@ -1419,15 +1418,11 @@ static irqreturn_t nvt_ts_work_func(int irq, void *data)
+ 	}
+ #endif
+ 	mutex_lock(&ts->lock);
+-	if (ts->debug_flag >= TOUCH_DISABLE_LPM)
+-		lpm_disable_for_input(true);
+ 	if (ts->dev_pm_suspend) {
+ 		ret = wait_for_completion_timeout(
+ 			&ts->dev_pm_suspend_completion, msecs_to_jiffies(500));
+ 		if (!ret) {
+ 			NVT_ERR("system(spi) can't finished resuming procedure, skip it\n");
+-			if (ts->debug_flag >= TOUCH_DISABLE_LPM)
+-				lpm_disable_for_input(false);
+ 			goto XFER_ERROR;
+ 		}
+ 	}
+@@ -1435,8 +1430,6 @@ static irqreturn_t nvt_ts_work_func(int irq, void *data)
+ 	ret = CTP_SPI_READ(ts->client, point_data, POINT_DATA_LEN + 1);
+ 	if (ret < 0) {
+ 		NVT_ERR("CTP_SPI_READ failed.(%d)\n", ret);
+-		if (ts->debug_flag >= TOUCH_DISABLE_LPM)
+-			lpm_disable_for_input(false);
+ 		goto XFER_ERROR;
+ 	}
+ 	/*
+@@ -1463,8 +1456,6 @@ static irqreturn_t nvt_ts_work_func(int irq, void *data)
+ 		} else {
+ 			nvt_update_firmware(ts->fw_name);
+ 		}
+-		if (ts->debug_flag >= TOUCH_DISABLE_LPM)
+-			lpm_disable_for_input(false);
+ 		goto XFER_ERROR;
+ 	}
+ #endif /* #if NVT_TOUCH_WDT_RECOVERY */
+@@ -1473,8 +1464,6 @@ static irqreturn_t nvt_ts_work_func(int irq, void *data)
+ 	/* ESD protect by FW handshake */
+ 	if (nvt_fw_recovery(point_data)) {
+ 		nvt_esd_check_enable(true);
+-		if (ts->debug_flag >= TOUCH_DISABLE_LPM)
+-			lpm_disable_for_input(false);
+ 		goto XFER_ERROR;
+ 	}
+ #endif /* #if NVT_TOUCH_ESD_PROTECT */
+@@ -1482,8 +1471,6 @@ static irqreturn_t nvt_ts_work_func(int irq, void *data)
+ #ifdef CONFIG_TOUCHSCREEN_XIAOMI_TOUCHFEATURE
+ 	input_id = (uint8_t)(point_data[1] >> 3);
+ 	if (nvt_check_palm(input_id, point_data)) {
+-		if (ts->debug_flag >= TOUCH_DISABLE_LPM)
+-			lpm_disable_for_input(false);
+ 		goto XFER_ERROR; /* to skip point data parsing */
+ 	}
+ #endif
+@@ -1492,8 +1479,6 @@ static irqreturn_t nvt_ts_work_func(int irq, void *data)
+ 	if (bTouchIsAwake == 0) {
+ 		input_id = (uint8_t)(point_data[1] >> 3);
+ 		nvt_ts_wakeup_gesture_report(input_id, point_data);
+-		if (ts->debug_flag >= TOUCH_DISABLE_LPM)
+-			lpm_disable_for_input(false);
+ 		mutex_unlock(&ts->lock);
+ 		return IRQ_HANDLED;
+ 	}
+@@ -1579,8 +1564,6 @@ static irqreturn_t nvt_ts_work_func(int irq, void *data)
+ 				input_report_key(ts->input_dev, BTN_TOUCH, 0);
+ 				input_report_key(ts->input_dev, BTN_TOOL_FINGER,
+ 						 0);
+-				if (ts->debug_flag >= TOUCH_DISABLE_LPM)
+-					lpm_disable_for_input(false);
+ 			}
+ 			clear_bit(i, ts->slot_map);
+ 		}
+-- 
+2.52.0
+

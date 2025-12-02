@@ -1,0 +1,47 @@
+From a0e339f25605ca0b985ab4c26e0a7a760350e81b Mon Sep 17 00:00:00 2001
+From: armdebug <armdebug@protonmail.com>
+Date: Sun, 27 Jul 2025 01:59:18 -0400
+Subject: [PATCH 114/115] arch: arm64: configs: xiaomi: Decommonize vayu audio
+ codec
+
+Reason: Breaks audio on cepheus and raphael
+
+Change-Id: I2ea55f3dbfe7f71fa34970a326c1fb8881eda5d1
+---
+ arch/arm64/configs/vendor/xiaomi/sm8150-common.config | 4 ----
+ arch/arm64/configs/vendor/xiaomi/vayu.config          | 4 ++++
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/arch/arm64/configs/vendor/xiaomi/sm8150-common.config b/arch/arm64/configs/vendor/xiaomi/sm8150-common.config
+index 942ae66bd..393551956 100644
+--- a/arch/arm64/configs/vendor/xiaomi/sm8150-common.config
++++ b/arch/arm64/configs/vendor/xiaomi/sm8150-common.config
+@@ -28,10 +28,6 @@ CONFIG_MTD_OOPS=y
+ CONFIG_MTD_BLOCK2MTD=y
+ 
+ # Audio
+-CONFIG_SND_SOC_TAS256X=y
+-CONFIG_TAS256X_CODEC=y
+-CONFIG_TAS256X_REGMAP=y
+-CONFIG_TAS25XX_ALGO=y
+ CONFIG_SND_SOC_TAS2557=y
+ CONFIG_TAS2557_REGMAP=y
+ CONFIG_TAS2557_CODEC=y
+diff --git a/arch/arm64/configs/vendor/xiaomi/vayu.config b/arch/arm64/configs/vendor/xiaomi/vayu.config
+index a3342fc69..f94e0c47c 100644
+--- a/arch/arm64/configs/vendor/xiaomi/vayu.config
++++ b/arch/arm64/configs/vendor/xiaomi/vayu.config
+@@ -4,6 +4,10 @@ CONFIG_MACH_XIAOMI_VAYU=y
+ # Audio
+ CONFIG_SND_SOC_CS35L41=y
+ CONFIG_MSM_CSPL=y
++CONFIG_SND_SOC_TAS256X=y
++CONFIG_TAS256X_CODEC=y
++CONFIG_TAS256X_REGMAP=y
++CONFIG_TAS25XX_ALGO=y
+ 
+ # Power
+ CONFIG_BATT_VERIFY_BY_DS28E16=y
+-- 
+2.52.0
+

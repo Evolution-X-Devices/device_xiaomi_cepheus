@@ -1,0 +1,94 @@
+From 77b735e758eb280151d21d267a5bb3c9fd3960ac Mon Sep 17 00:00:00 2001
+From: Demon000 <demonsingur@gmail.com>
+Date: Mon, 8 Jul 2019 01:56:43 +0200
+Subject: [PATCH 017/115] drivers: gpu: drm: msm: modify lp11 mode logic
+
+Change-Id: I630f67c0d2ec1537ef236fb8363ee84f13e953d4
+---
+ drivers/gpu/drm/msm/dsi-staging/dsi_panel.c | 33 +++++++++++++++++----
+ 1 file changed, 28 insertions(+), 5 deletions(-)
+
+diff --git a/drivers/gpu/drm/msm/dsi-staging/dsi_panel.c b/drivers/gpu/drm/msm/dsi-staging/dsi_panel.c
+index 906fb8af1..fa54a98cb 100644
+--- a/drivers/gpu/drm/msm/dsi-staging/dsi_panel.c
++++ b/drivers/gpu/drm/msm/dsi-staging/dsi_panel.c
+@@ -447,6 +447,10 @@ static int dsi_panel_power_on(struct dsi_panel *panel)
+ 		goto error_disable_vregs;
+ 	}
+ 
++	/* If LP11_INIT is set, skip panel reset here*/
++	if (panel->lp11_init)
++		goto exit;
++
+ 	rc = dsi_panel_reset(panel);
+ 	if (rc) {
+ 		pr_err("[%s] failed to reset panel, rc=%d\n", panel->name, rc);
+@@ -3810,9 +3814,11 @@ int dsi_panel_pre_prepare(struct dsi_panel *panel)
+ 
+ 	mutex_lock(&panel->panel_lock);
+ 
++#if 0
+ 	/* If LP11_INIT is set, panel will be powered up during prepare() */
+ 	if (panel->lp11_init)
+ 		goto error;
++#endif
+ 
+ 	rc = dsi_panel_power_on(panel);
+ 	if (rc) {
+@@ -3960,12 +3966,19 @@ int dsi_panel_prepare(struct dsi_panel *panel)
+ 	mutex_lock(&panel->panel_lock);
+ 
+ 	if (panel->lp11_init) {
++#if 0
+ 		rc = dsi_panel_power_on(panel);
+ 		if (rc) {
+ 			pr_err("[%s] panel power on failed, rc=%d\n",
+ 			       panel->name, rc);
+ 			goto error;
+ 		}
++#endif
++		rc = dsi_panel_reset(panel);
++		if (rc) {
++			pr_err("[%s] failed to reset panel, rc=%d\n", panel->name, rc);
++			goto error;
++		}
+ 	}
+ 
+ 	rc = dsi_panel_tx_cmd_set(panel, DSI_CMD_SET_PRE_ON);
+@@ -4380,6 +4393,14 @@ int dsi_panel_unprepare(struct dsi_panel *panel)
+ 		goto error;
+ 	}
+ 
++	if (!panel->lp11_init) {
++		rc = dsi_panel_power_off(panel);
++		if (rc) {
++			pr_err("[%s] panel power_Off failed, rc=%d\n",
++			       panel->name, rc);
++			goto error;
++		}
++	}
+ error:
+ 	mutex_unlock(&panel->panel_lock);
+ 	return rc;
+@@ -4396,11 +4417,13 @@ int dsi_panel_post_unprepare(struct dsi_panel *panel)
+ 
+ 	mutex_lock(&panel->panel_lock);
+ 
+-	rc = dsi_panel_power_off(panel);
+-	if (rc) {
+-		pr_err("[%s] panel power_Off failed, rc=%d\n",
+-		       panel->name, rc);
+-		goto error;
++	if (panel->lp11_init) {
++		rc = dsi_panel_power_off(panel);
++		if (rc) {
++			pr_err("[%s] panel power_Off failed, rc=%d\n",
++			       panel->name, rc);
++			goto error;
++		}
+ 	}
+ error:
+ 	mutex_unlock(&panel->panel_lock);
+-- 
+2.52.0
+

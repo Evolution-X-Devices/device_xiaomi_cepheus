@@ -1,0 +1,81 @@
+From 92ee7f99b773d2db8743db9462a225985d64436d Mon Sep 17 00:00:00 2001
+From: Sebastiano Barezzi <barezzisebastiano@gmail.com>
+Date: Thu, 8 Jul 2021 21:06:13 +0200
+Subject: [PATCH 101/115] techpack: audio: asoc: codecs: tas256x: Shut up
+
+Change-Id: I4beed107b75999e6f909467062bccb0a0e3229eb
+---
+ techpack/audio/asoc/codecs/tas256x/tas256x-codec.c  | 1 +
+ techpack/audio/asoc/codecs/tas256x/tas256x-regmap.c | 1 +
+ techpack/audio/asoc/codecs/tas256x/tas25xx-algo.c   | 1 +
+ techpack/audio/asoc/codecs/tas256x/tas25xx-calib.c  | 1 +
+ techpack/audio/asoc/codecs/tas256x/tas25xx-debug.h  | 9 +++++++++
+ 5 files changed, 13 insertions(+)
+ create mode 100644 techpack/audio/asoc/codecs/tas256x/tas25xx-debug.h
+
+diff --git a/techpack/audio/asoc/codecs/tas256x/tas256x-codec.c b/techpack/audio/asoc/codecs/tas256x/tas256x-codec.c
+index b95e7e03a..6bb7bf9b5 100644
+--- a/techpack/audio/asoc/codecs/tas256x/tas256x-codec.c
++++ b/techpack/audio/asoc/codecs/tas256x/tas256x-codec.c
+@@ -53,6 +53,7 @@
+ #endif /*CONFIG_PLATFORM_EXYNOS*/
+ #include "tas25xx-calib.h"
+ #endif /*CONFIG_TAS25XX_ALGO*/
++#include "tas25xx-debug.h"
+ 
+ #define TAS256X_MDELAY 0xFFFFFFFE
+ #define TAS256X_MSLEEP 0xFFFFFFFD
+diff --git a/techpack/audio/asoc/codecs/tas256x/tas256x-regmap.c b/techpack/audio/asoc/codecs/tas256x/tas256x-regmap.c
+index 02f8090cb..4f817d9ad 100644
+--- a/techpack/audio/asoc/codecs/tas256x/tas256x-regmap.c
++++ b/techpack/audio/asoc/codecs/tas256x/tas256x-regmap.c
+@@ -42,6 +42,7 @@
+ #include "tas2564.h"
+ #include "tas256x-device.h"
+ #include "tas256x-codec.h"
++#include "tas25xx-debug.h"
+ 
+ #ifdef CONFIG_TAS25XX_ALGO
+ #ifdef CONFIG_PLATFORM_EXYNOS
+diff --git a/techpack/audio/asoc/codecs/tas256x/tas25xx-algo.c b/techpack/audio/asoc/codecs/tas256x/tas25xx-algo.c
+index 4da82e220..90f01be0e 100644
+--- a/techpack/audio/asoc/codecs/tas256x/tas25xx-algo.c
++++ b/techpack/audio/asoc/codecs/tas256x/tas25xx-algo.c
+@@ -4,6 +4,7 @@
+ #include <linux/syscalls.h>
+ #include <linux/fs.h>
+ #include "tas25xx-calib.h"
++#include "tas25xx-debug.h"
+ 
+ #define USE_VFS 1
+ #define CODEC_CONTROL 1
+diff --git a/techpack/audio/asoc/codecs/tas256x/tas25xx-calib.c b/techpack/audio/asoc/codecs/tas256x/tas25xx-calib.c
+index 862025d74..b1b21f92c 100644
+--- a/techpack/audio/asoc/codecs/tas256x/tas25xx-calib.c
++++ b/techpack/audio/asoc/codecs/tas256x/tas25xx-calib.c
+@@ -32,6 +32,7 @@
+ #include <linux/uaccess.h>
+ #include <linux/miscdevice.h>
+ #include <dsp/tas_smart_amp_v2.h>
++#include "tas25xx-debug.h"
+ 
+ /* Holds the Packet data required for processing */
+ struct tas_dsp_pkt {
+diff --git a/techpack/audio/asoc/codecs/tas256x/tas25xx-debug.h b/techpack/audio/asoc/codecs/tas256x/tas25xx-debug.h
+new file mode 100644
+index 000000000..87a11a717
+--- /dev/null
++++ b/techpack/audio/asoc/codecs/tas256x/tas25xx-debug.h
+@@ -0,0 +1,9 @@
++//#define DEBUG
++
++#ifndef DEBUG
++#undef dev_info
++#undef pr_info
++
++#define dev_info(...) dev_dbg(__VA_ARGS__)
++#define pr_info(...) pr_debug(__VA_ARGS__)
++#endif
+-- 
+2.52.0
+

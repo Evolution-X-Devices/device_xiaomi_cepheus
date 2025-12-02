@@ -1,0 +1,104 @@
+From 7aed6e2eb4b65398ec25435d0bdc385bb4ed8238 Mon Sep 17 00:00:00 2001
+From: Demon000 <demonsingur@gmail.com>
+Date: Mon, 2 Dec 2019 03:49:20 +0100
+Subject: [PATCH 015/115] drivers: gpu: drm: msm: extend qcom drm notifier
+
+Change-Id: Id266a34b20403a9f3ef445902730f293712bf260
+---
+ drivers/gpu/drm/msm/dsi-staging/dsi_display.c | 15 ++++++++++++++-
+ drivers/gpu/drm/msm/msm_atomic.c              |  3 ++-
+ include/linux/msm_drm_notify.h                |  5 +++++
+ 3 files changed, 21 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/gpu/drm/msm/dsi-staging/dsi_display.c b/drivers/gpu/drm/msm/dsi-staging/dsi_display.c
+index 5dc4961d0..893d1c8d4 100644
+--- a/drivers/gpu/drm/msm/dsi-staging/dsi_display.c
++++ b/drivers/gpu/drm/msm/dsi-staging/dsi_display.c
+@@ -19,6 +19,8 @@
+ #include <linux/of_gpio.h>
+ #include <linux/err.h>
+ 
++#include <linux/msm_drm_notify.h>
++
+ #include "msm_drv.h"
+ #include "sde_connector.h"
+ #include "msm_mmu.h"
+@@ -1058,6 +1060,8 @@ int dsi_display_set_power(struct drm_connector *connector,
+ 		int power_mode, void *disp)
+ {
+ 	struct dsi_display *display = disp;
++	struct msm_drm_notifier notify_data;
++	int event = power_mode;
+ 	int rc = 0;
+ 
+ 	if (!display || !display->panel) {
+@@ -1065,17 +1069,26 @@ int dsi_display_set_power(struct drm_connector *connector,
+ 		return -EINVAL;
+ 	}
+ 
++	notify_data.data = &event;
++
+ 	switch (power_mode) {
+ 	case SDE_MODE_DPMS_LP1:
++		msm_drm_notifier_call_chain(MSM_DRM_EARLY_EVENT_BLANK, &notify_data);
+ 		rc = dsi_panel_set_lp1(display->panel);
++		msm_drm_notifier_call_chain(MSM_DRM_EVENT_BLANK, &notify_data);
+ 		break;
+ 	case SDE_MODE_DPMS_LP2:
++		msm_drm_notifier_call_chain(MSM_DRM_EARLY_EVENT_BLANK, &notify_data);
+ 		rc = dsi_panel_set_lp2(display->panel);
++		msm_drm_notifier_call_chain(MSM_DRM_EVENT_BLANK, &notify_data);
+ 		break;
+ 	case SDE_MODE_DPMS_ON:
+ 		if (display->panel->power_mode == SDE_MODE_DPMS_LP1 ||
+-			display->panel->power_mode == SDE_MODE_DPMS_LP2)
++			display->panel->power_mode == SDE_MODE_DPMS_LP2) {
++			msm_drm_notifier_call_chain(MSM_DRM_EARLY_EVENT_BLANK, &notify_data);
+ 			rc = dsi_panel_set_nolp(display->panel);
++			msm_drm_notifier_call_chain(MSM_DRM_EVENT_BLANK, &notify_data);
++		}
+ 		break;
+ 	case SDE_MODE_DPMS_OFF:
+ 	default:
+diff --git a/drivers/gpu/drm/msm/msm_atomic.c b/drivers/gpu/drm/msm/msm_atomic.c
+index 39f1e7c3b..d681a20d2 100644
+--- a/drivers/gpu/drm/msm/msm_atomic.c
++++ b/drivers/gpu/drm/msm/msm_atomic.c
+@@ -73,11 +73,12 @@ EXPORT_SYMBOL(msm_drm_unregister_client);
+  * @v: notifier data, inculde display id and display blank
+  *     event(unblank or power down).
+  */
+-static int msm_drm_notifier_call_chain(unsigned long val, void *v)
++int msm_drm_notifier_call_chain(unsigned long val, void *v)
+ {
+ 	return blocking_notifier_call_chain(&msm_drm_notifier_list, val,
+ 					    v);
+ }
++EXPORT_SYMBOL(msm_drm_notifier_call_chain);
+ 
+ /* block until specified crtcs are no longer pending update, and
+  * atomically mark them as pending update
+diff --git a/include/linux/msm_drm_notify.h b/include/linux/msm_drm_notify.h
+index 924ba852c..4f9b32662 100644
+--- a/include/linux/msm_drm_notify.h
++++ b/include/linux/msm_drm_notify.h
+@@ -23,6 +23,10 @@
+ enum {
+ 	/* panel: power on */
+ 	MSM_DRM_BLANK_UNBLANK,
++	MSM_DRM_BLANK_LP1,
++	MSM_DRM_BLANK_LP2,
++	MSM_DRM_BLANK_STANDBY,
++	MSM_DRM_BLANK_SUSPEND,
+ 	/* panel: power off */
+ 	MSM_DRM_BLANK_POWERDOWN,
+ };
+@@ -42,4 +46,5 @@ struct msm_drm_notifier {
+ 
+ int msm_drm_register_client(struct notifier_block *nb);
+ int msm_drm_unregister_client(struct notifier_block *nb);
++int msm_drm_notifier_call_chain(unsigned long val, void *v);
+ #endif
+-- 
+2.52.0
+

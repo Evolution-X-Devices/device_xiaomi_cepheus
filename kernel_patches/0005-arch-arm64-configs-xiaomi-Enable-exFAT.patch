@@ -1,0 +1,24 @@
+From c2162f3079928f89e16cf83945855ec492ea68b9 Mon Sep 17 00:00:00 2001
+From: Sebastiano Barezzi <barezzisebastiano@gmail.com>
+Date: Wed, 22 Jun 2022 02:18:19 +0200
+Subject: [PATCH 005/115] arch: arm64: configs: xiaomi: Enable exFAT
+
+Change-Id: Ib7eb7141986625b0d01f989ae00493ddc3c4a9b8
+---
+ arch/arm64/configs/vendor/xiaomi/sm8150-common.config | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/arch/arm64/configs/vendor/xiaomi/sm8150-common.config b/arch/arm64/configs/vendor/xiaomi/sm8150-common.config
+index 53dd50573..06a15cb7c 100644
+--- a/arch/arm64/configs/vendor/xiaomi/sm8150-common.config
++++ b/arch/arm64/configs/vendor/xiaomi/sm8150-common.config
+@@ -3,3 +3,6 @@ CONFIG_BUILD_ARM64_DT_OVERLAY=y
+ 
+ # QCACLD
+ CONFIG_QCA_CLD_WLAN=y
++
++# exFAT
++CONFIG_EXFAT_FS=y
+-- 
+2.52.0
+

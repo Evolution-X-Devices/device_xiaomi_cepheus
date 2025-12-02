@@ -1,0 +1,27 @@
+From 924094cc3c057f26d3f19260e7da1d34c0142da5 Mon Sep 17 00:00:00 2001
+From: Sebastiano Barezzi <seba@sebaubuntu.dev>
+Date: Tue, 16 Apr 2024 03:39:57 +0200
+Subject: [PATCH 060/115] drivers: input: touchscreen: xiaomi: nt36523: Fix
+ function declaration args
+
+Change-Id: Ieea79fa899abf340d1ea5827e0b660e42559d2ad
+---
+ drivers/input/touchscreen/xiaomi/nt36523/nt36xxx.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/input/touchscreen/xiaomi/nt36523/nt36xxx.c b/drivers/input/touchscreen/xiaomi/nt36523/nt36xxx.c
+index 707cacb27..d9dc28329 100644
+--- a/drivers/input/touchscreen/xiaomi/nt36523/nt36xxx.c
++++ b/drivers/input/touchscreen/xiaomi/nt36523/nt36xxx.c
+@@ -1113,7 +1113,7 @@ void nvt_ts_wakeup_gesture_report(uint8_t gesture_id, uint8_t *data)
+ }
+ #endif
+ 
+-static void release_pen_event()
++static void release_pen_event(void)
+ {
+ 	if (ts && ts->pen_input_dev) {
+ 		input_report_abs(ts->pen_input_dev, ABS_X, 0);
+-- 
+2.52.0
+

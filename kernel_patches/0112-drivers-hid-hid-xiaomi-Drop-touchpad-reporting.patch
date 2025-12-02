@@ -1,0 +1,45 @@
+From 55bd3fdbc1ca56579ca988e64aaa19914fed5820 Mon Sep 17 00:00:00 2001
+From: Sebastiano Barezzi <seba@sebaubuntu.dev>
+Date: Sat, 3 Aug 2024 04:56:03 +0200
+Subject: [PATCH 112/115] drivers: hid: hid-xiaomi: Drop touchpad reporting
+
+The keyboard doesn't have one
+
+Change-Id: Ieab11b2019e14bf22d2b76990e4fbd0dabc86e9a
+---
+ drivers/hid/hid-xiaomi.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+diff --git a/drivers/hid/hid-xiaomi.c b/drivers/hid/hid-xiaomi.c
+index c6a8d256b..88e67e995 100644
+--- a/drivers/hid/hid-xiaomi.c
++++ b/drivers/hid/hid-xiaomi.c
+@@ -106,6 +106,17 @@ static void xiaomi_connection_work(struct work_struct *work)
+ 	xiaomi_safe_toggle(hdev, connected);
+ }
+ 
++static int xiaomi_input_configured(struct hid_device *hdev,
++				   struct hid_input *hi)
++{
++	struct input_dev *input = hi->input;
++
++	// Drop EV_REL, the keyboard doesn't have a touchpad
++	__clear_bit(EV_REL, input->evbit);
++
++	return 0;
++}
++
+ static int xiaomi_probe(struct hid_device *hdev, const struct hid_device_id *id)
+ {
+ 	struct xiaomi_priv *priv;
+@@ -207,6 +218,7 @@ static struct hid_driver hid_xiaomi = {
+ 	.id_table = xiaomi_devices,
+ 	.probe = xiaomi_probe,
+ 	.remove = xiaomi_remove,
++	.input_configured = xiaomi_input_configured,
+ };
+ module_hid_driver(hid_xiaomi);
+ 
+-- 
+2.52.0
+

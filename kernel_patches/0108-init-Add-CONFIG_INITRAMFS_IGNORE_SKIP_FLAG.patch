@@ -1,0 +1,107 @@
+From 936f0959715c7510b35df48b2e7f2aaeffe85cfb Mon Sep 17 00:00:00 2001
+From: Sebastiano Barezzi <barezzisebastiano@gmail.com>
+Date: Tue, 28 Jun 2022 23:10:29 +0200
+Subject: [PATCH 108/115] init: Add CONFIG_INITRAMFS_IGNORE_SKIP_FLAG
+
+* Ignoring an ignore flag, yikes
+* Also replace skip_initramfs with want_initramfs
+
+Co-authored-by: Erfan Abdi <erfangplus@gmail.com>
+Change-Id: Ifdf726f128bc66bf860bbb71024f94f56879710f
+---
+ fs/proc/cmdline.c | 31 +++++++++++++++++++++++++++++++
+ init/initramfs.c  |  2 +-
+ usr/Kconfig       | 11 +++++++++++
+ 3 files changed, 43 insertions(+), 1 deletion(-)
+
+diff --git a/fs/proc/cmdline.c b/fs/proc/cmdline.c
+index 403cbb12a..01e1f0eeb 100644
+--- a/fs/proc/cmdline.c
++++ b/fs/proc/cmdline.c
+@@ -3,10 +3,37 @@
+ #include <linux/init.h>
+ #include <linux/proc_fs.h>
+ #include <linux/seq_file.h>
++#ifdef CONFIG_INITRAMFS_IGNORE_SKIP_FLAG
++#include <asm/setup.h>
++#endif
++
++#ifdef CONFIG_INITRAMFS_IGNORE_SKIP_FLAG
++#define INITRAMFS_STR_FIND "skip_initramfs"
++#define INITRAMFS_STR_REPLACE "want_initramfs"
++#define INITRAMFS_STR_LEN (sizeof(INITRAMFS_STR_FIND) - 1)
++
++static char proc_command_line[COMMAND_LINE_SIZE];
++
++static void proc_command_line_init(void) {
++	char *offset_addr;
++
++	strcpy(proc_command_line, saved_command_line);
++
++	offset_addr = strstr(proc_command_line, INITRAMFS_STR_FIND);
++	if (!offset_addr)
++		return;
++
++	memcpy(offset_addr, INITRAMFS_STR_REPLACE, INITRAMFS_STR_LEN);
++}
++#endif
+ 
+ static int cmdline_proc_show(struct seq_file *m, void *v)
+ {
++#ifdef CONFIG_INITRAMFS_IGNORE_SKIP_FLAG
++	seq_printf(m, "%s\n", proc_command_line);
++#else
+ 	seq_printf(m, "%s\n", saved_command_line);
++#endif
+ 	return 0;
+ }
+ 
+@@ -24,6 +51,10 @@ static const struct file_operations cmdline_proc_fops = {
+ 
+ static int __init proc_cmdline_init(void)
+ {
++#ifdef CONFIG_INITRAMFS_IGNORE_SKIP_FLAG
++	proc_command_line_init();
++#endif
++
+ 	proc_create("cmdline", 0, NULL, &cmdline_proc_fops);
+ 	return 0;
+ }
+diff --git a/init/initramfs.c b/init/initramfs.c
+index 33fdbdc19..431ea8fa6 100644
+--- a/init/initramfs.c
++++ b/init/initramfs.c
+@@ -614,7 +614,7 @@ static int __init skip_initramfs_param(char *str)
+ {
+ 	if (*str)
+ 		return 0;
+-	do_skip_initramfs = 1;
++	do_skip_initramfs = !IS_ENABLED(CONFIG_INITRAMFS_IGNORE_SKIP_FLAG);
+ 	return 1;
+ }
+ __setup("skip_initramfs", skip_initramfs_param);
+diff --git a/usr/Kconfig b/usr/Kconfig
+index 8b4826de1..de9d04f2c 100644
+--- a/usr/Kconfig
++++ b/usr/Kconfig
+@@ -32,6 +32,17 @@ config INITRAMFS_FORCE
+ 	  and is useful if you cannot or don't want to change the image
+ 	  your bootloader passes to the kernel.
+ 
++config INITRAMFS_IGNORE_SKIP_FLAG
++	bool "Force initramfs even when skip_initramfs is set"
++	default n
++	help
++	  Ignore skip_initramfs cmdline flag.
++
++	  This should only be used if you have no control over cmdline
++	  passed by your bootloader yet you can't use CMDLINE_FORCE.
++
++	  If unsure say N.
++
+ config INITRAMFS_ROOT_UID
+ 	int "User ID to map to 0 (user root)"
+ 	depends on INITRAMFS_SOURCE!=""
+-- 
+2.52.0
+

@@ -1,0 +1,35 @@
+From 17540caae5dd57a119f2d4a21743f3086c11368a Mon Sep 17 00:00:00 2001
+From: Sebastiano Barezzi <seba@sebaubuntu.dev>
+Date: Tue, 11 Jun 2024 22:37:40 +0200
+Subject: [PATCH 064/115] drivers: input: touchscreen: tp_common: Add pen node
+
+Change-Id: I5d4046dba7a13d58cd78d2fafdc89e57e4747873
+---
+ drivers/input/touchscreen/tp_common.c | 1 +
+ include/linux/input/tp_common.h       | 1 +
+ 2 files changed, 2 insertions(+)
+
+diff --git a/drivers/input/touchscreen/tp_common.c b/drivers/input/touchscreen/tp_common.c
+index d3a549845..404994c4c 100644
+--- a/drivers/input/touchscreen/tp_common.c
++++ b/drivers/input/touchscreen/tp_common.c
+@@ -14,6 +14,7 @@ struct kobject *touchpanel_kobj;
+ 
+ TS_ENABLE_FOPS(double_tap)
+ TS_ENABLE_FOPS(fod_status)
++TS_ENABLE_FOPS(pen)
+ 
+ static int __init tp_common_init(void)
+ {
+diff --git a/include/linux/input/tp_common.h b/include/linux/input/tp_common.h
+index 0428a046f..9cb74e80c 100644
+--- a/include/linux/input/tp_common.h
++++ b/include/linux/input/tp_common.h
+@@ -11,3 +11,4 @@ struct tp_common_ops {
+ 
+ int tp_common_set_double_tap_ops(struct tp_common_ops *ops);
+ int tp_common_set_fod_status_ops(struct tp_common_ops *ops);
++int tp_common_set_pen_ops(struct tp_common_ops *ops);
+-- 
+2.52.0
+

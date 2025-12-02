@@ -1,0 +1,66 @@
+From e450ddc3c3d6be5119702b3d13bc231ceac5406e Mon Sep 17 00:00:00 2001
+From: Sebastiano Barezzi <barezzisebastiano@gmail.com>
+Date: Wed, 22 Jun 2022 19:46:43 +0200
+Subject: [PATCH 096/115] drivers: video: backlight: Import Xiaomi changes
+
+Change-Id: I0b3488cc6d49d4a9b3cbcaa699489e608e685713
+---
+ drivers/video/backlight/backlight.c | 12 ++++++++++++
+ include/linux/backlight.h           | 10 ++++++++++
+ 2 files changed, 22 insertions(+)
+
+diff --git a/drivers/video/backlight/backlight.c b/drivers/video/backlight/backlight.c
+index 8c835f16a..361e7e511 100644
+--- a/drivers/video/backlight/backlight.c
++++ b/drivers/video/backlight/backlight.c
+@@ -24,6 +24,9 @@
+ static struct list_head backlight_dev_list;
+ static struct mutex backlight_dev_list_mutex;
+ static struct blocking_notifier_head backlight_notifier;
++#ifdef CONFIG_MACH_XIAOMI_SM8150
++static int bl_event;
++#endif
+ 
+ static const char *const backlight_types[] = {
+ 	[BACKLIGHT_RAW] = "raw",
+@@ -181,6 +184,15 @@ int backlight_device_set_brightness(struct backlight_device *bd,
+ 			rc = -EINVAL;
+ 		else {
+ 			pr_debug("set brightness to %lu\n", brightness);
++#ifdef CONFIG_MACH_XIAOMI_SM8150
++			if (!brightness) {
++				bl_event = BACKLIGHT_OFF;
++				blocking_notifier_call_chain(&backlight_notifier, BACKLIGHT_UPDATED, &bl_event);
++			} else if (bl_event != BACKLIGHT_ON) {
++				bl_event = BACKLIGHT_ON;
++				blocking_notifier_call_chain(&backlight_notifier, BACKLIGHT_UPDATED, &bl_event);
++			}
++#endif
+ 			bd->props.brightness = brightness;
+ 			rc = backlight_update_status(bd);
+ 		}
+diff --git a/include/linux/backlight.h b/include/linux/backlight.h
+index 16f02e071..f6abdbd27 100644
+--- a/include/linux/backlight.h
++++ b/include/linux/backlight.h
+@@ -45,7 +45,17 @@ enum backlight_type {
+ enum backlight_notification {
+ 	BACKLIGHT_REGISTERED,
+ 	BACKLIGHT_UNREGISTERED,
++#ifdef CONFIG_MACH_XIAOMI_SM8150
++	BACKLIGHT_UPDATED,
++#endif
++};
++
++#ifdef CONFIG_MACH_XIAOMI_SM8150
++enum backlight_brightness {
++	BACKLIGHT_OFF,
++	BACKLIGHT_ON,
+ };
++#endif
+ 
+ struct backlight_device;
+ struct fb_info;
+-- 
+2.52.0
+

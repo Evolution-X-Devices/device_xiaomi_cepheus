@@ -1,0 +1,85 @@
+From 6e5d9012d5e3472a02e99ea9cdb166c6e44d5f0b Mon Sep 17 00:00:00 2001
+From: Sebastiano Barezzi <seba@sebaubuntu.dev>
+Date: Wed, 24 Apr 2024 19:09:51 +0200
+Subject: [PATCH 034/115] drivers: gpu: drm: msm: Add cphy_strength support
+
+Change-Id: Ifaf8d2b874f2a7e8399f2b450a1003049e32f5eb
+---
+ drivers/gpu/drm/msm/dsi-staging/dsi_defs.h        | 1 +
+ drivers/gpu/drm/msm/dsi-staging/dsi_panel.c       | 2 ++
+ drivers/gpu/drm/msm/dsi-staging/dsi_phy.c         | 1 +
+ drivers/gpu/drm/msm/dsi-staging/dsi_phy_hw.h      | 1 +
+ drivers/gpu/drm/msm/dsi-staging/dsi_phy_hw_v4_0.c | 8 ++++++++
+ 5 files changed, 13 insertions(+)
+
+diff --git a/drivers/gpu/drm/msm/dsi-staging/dsi_defs.h b/drivers/gpu/drm/msm/dsi-staging/dsi_defs.h
+index c1817b961..a5b502ef3 100644
+--- a/drivers/gpu/drm/msm/dsi-staging/dsi_defs.h
++++ b/drivers/gpu/drm/msm/dsi-staging/dsi_defs.h
+@@ -509,6 +509,7 @@ struct dsi_host_common_cfg {
+ 	bool force_hs_clk_lane;
+ 	enum dsi_phy_type phy_type;
+ 	struct dsi_split_link_config split_link;
++	bool cphy_strength;
+ };
+ 
+ /**
+diff --git a/drivers/gpu/drm/msm/dsi-staging/dsi_panel.c b/drivers/gpu/drm/msm/dsi-staging/dsi_panel.c
+index e2371808c..2d5d695fb 100644
+--- a/drivers/gpu/drm/msm/dsi-staging/dsi_panel.c
++++ b/drivers/gpu/drm/msm/dsi-staging/dsi_panel.c
+@@ -1278,6 +1278,8 @@ static int dsi_panel_parse_misc_host_config(struct dsi_host_common_cfg *host,
+ 					"qcom,panel-cphy-mode");
+ 	host->phy_type = panel_cphy_mode ? DSI_PHY_TYPE_CPHY
+ 						: DSI_PHY_TYPE_DPHY;
++	host->cphy_strength = utils->read_bool(utils->data,
++					"qcom,mdss-dsi-cphy-strength");
+ 
+ 	return 0;
+ }
+diff --git a/drivers/gpu/drm/msm/dsi-staging/dsi_phy.c b/drivers/gpu/drm/msm/dsi-staging/dsi_phy.c
+index 7444b27c9..c49c327d6 100644
+--- a/drivers/gpu/drm/msm/dsi-staging/dsi_phy.c
++++ b/drivers/gpu/drm/msm/dsi-staging/dsi_phy.c
+@@ -925,6 +925,7 @@ int dsi_phy_enable(struct msm_dsi_phy *phy,
+ 	phy->dst_format = config->common_config.dst_format;
+ 	phy->cfg.pll_source = pll_source;
+ 	phy->cfg.bit_clk_rate_hz = config->bit_clk_rate_hz;
++	phy->cfg.cphy_strength = config->common_config.cphy_strength;
+ 
+ 	/**
+ 	 * If PHY timing parameters are not present in panel dtsi file,
+diff --git a/drivers/gpu/drm/msm/dsi-staging/dsi_phy_hw.h b/drivers/gpu/drm/msm/dsi-staging/dsi_phy_hw.h
+index e13536313..ef9876e78 100644
+--- a/drivers/gpu/drm/msm/dsi-staging/dsi_phy_hw.h
++++ b/drivers/gpu/drm/msm/dsi-staging/dsi_phy_hw.h
+@@ -111,6 +111,7 @@ struct dsi_phy_cfg {
+ 	bool force_clk_lane_hs;
+ 	enum dsi_phy_type phy_type;
+ 	unsigned long bit_clk_rate_hz;
++	bool cphy_strength;
+ };
+ 
+ struct dsi_phy_hw;
+diff --git a/drivers/gpu/drm/msm/dsi-staging/dsi_phy_hw_v4_0.c b/drivers/gpu/drm/msm/dsi-staging/dsi_phy_hw_v4_0.c
+index f9abd95ce..e5339f9c1 100644
+--- a/drivers/gpu/drm/msm/dsi-staging/dsi_phy_hw_v4_0.c
++++ b/drivers/gpu/drm/msm/dsi-staging/dsi_phy_hw_v4_0.c
+@@ -188,6 +188,14 @@ static void dsi_phy_hw_cphy_enable(struct dsi_phy_hw *phy,
+ 	DSI_W32(phy, DSIPHY_CMN_GLBL_RESCODE_OFFSET_BOT_CTRL, 0x3c);
+ 	DSI_W32(phy, DSIPHY_CMN_GLBL_LPTX_STR_CTRL, 0x55);
+ 
++	if (cfg->cphy_strength) {
++		DSI_W32(phy, DSIPHY_CMN_VREG_CTRL_0, 0x50);
++		DSI_W32(phy, DSIPHY_CMN_VREG_CTRL_1, 0x54);
++		DSI_W32(phy, DSIPHY_CMN_GLBL_RESCODE_OFFSET_TOP_CTRL, 0x1F);
++		DSI_W32(phy, DSIPHY_CMN_GLBL_RESCODE_OFFSET_BOT_CTRL, 0x1F);
++		DSI_W32(phy, DSIPHY_CMN_GLBL_RESCODE_OFFSET_MID_CTRL, 0x1F);
++	}
++
+ 	/* Remove power down from all blocks */
+ 	DSI_W32(phy, DSIPHY_CMN_CTRL_0, 0x7f);
+ 
+-- 
+2.52.0
+

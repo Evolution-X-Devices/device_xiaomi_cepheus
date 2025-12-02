@@ -1,0 +1,86 @@
+From 2d0fb151f14e02b636d3f5804347659a35dc8e7b Mon Sep 17 00:00:00 2001
+From: Demon000 <demonsingur@gmail.com>
+Date: Mon, 8 Jun 2020 17:18:11 +0200
+Subject: [PATCH 026/115] drivers: gpu: drm: msm: dsi-staging: trigger drm
+ notifier
+
+Change-Id: I225b36292f96eafb0703e3f0701f924f20b186d5
+---
+ drivers/gpu/drm/msm/dsi-staging/dsi_drm.c | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
+
+diff --git a/drivers/gpu/drm/msm/dsi-staging/dsi_drm.c b/drivers/gpu/drm/msm/dsi-staging/dsi_drm.c
+index 47fc72219..e659930e6 100644
+--- a/drivers/gpu/drm/msm/dsi-staging/dsi_drm.c
++++ b/drivers/gpu/drm/msm/dsi-staging/dsi_drm.c
+@@ -14,6 +14,8 @@
+ 
+ 
+ #define pr_fmt(fmt)	"dsi-drm:[%s] " fmt, __func__
++#include <linux/msm_drm_notify.h>
++
+ #include <drm/drm_atomic_helper.h>
+ #include <drm/drm_atomic.h>
+ 
+@@ -172,6 +174,8 @@ static void dsi_bridge_pre_enable(struct drm_bridge *bridge)
+ {
+ 	int rc = 0;
+ 	struct dsi_bridge *c_bridge = to_dsi_bridge(bridge);
++	struct msm_drm_notifier notify_data;
++	int power_mode;
+ 
+ 	if (!bridge) {
+ 		pr_err("Invalid params\n");
+@@ -185,6 +189,11 @@ static void dsi_bridge_pre_enable(struct drm_bridge *bridge)
+ 
+ 	atomic_set(&c_bridge->display->panel->esd_recovery_pending, 0);
+ 
++	power_mode = sde_connector_get_lp(c_bridge->display->drm_conn);
++	notify_data.data = &power_mode;
++	notify_data.id = MSM_DRM_PRIMARY_DISPLAY;
++	msm_drm_notifier_call_chain(MSM_DRM_EARLY_EVENT_BLANK, &notify_data);
++
+ 	/* By this point mode should have been validated through mode_fixup */
+ 	rc = dsi_display_set_mode(c_bridge->display,
+ 			&(c_bridge->dsi_mode), 0x0);
+@@ -220,6 +229,8 @@ static void dsi_bridge_pre_enable(struct drm_bridge *bridge)
+ 	}
+ 	SDE_ATRACE_END("dsi_display_enable");
+ 
++	msm_drm_notifier_call_chain(MSM_DRM_EVENT_BLANK, &notify_data);
++
+ 	rc = dsi_display_splash_res_cleanup(c_bridge->display);
+ 	if (rc)
+ 		pr_err("Continuous splash pipeline cleanup failed, rc=%d\n",
+@@ -291,12 +302,19 @@ static void dsi_bridge_post_disable(struct drm_bridge *bridge)
+ {
+ 	int rc = 0;
+ 	struct dsi_bridge *c_bridge = to_dsi_bridge(bridge);
++	struct msm_drm_notifier notify_data;
++	int power_mode;
+ 
+ 	if (!bridge) {
+ 		pr_err("Invalid params\n");
+ 		return;
+ 	}
+ 
++	power_mode = sde_connector_get_lp(c_bridge->display->drm_conn);
++	notify_data.data = &power_mode;
++	notify_data.id = MSM_DRM_PRIMARY_DISPLAY;
++	msm_drm_notifier_call_chain(MSM_DRM_EARLY_EVENT_BLANK, &notify_data);
++
+ 	SDE_ATRACE_BEGIN("dsi_bridge_post_disable");
+ 	SDE_ATRACE_BEGIN("dsi_display_disable");
+ 	rc = dsi_display_disable(c_bridge->display);
+@@ -316,6 +334,8 @@ static void dsi_bridge_post_disable(struct drm_bridge *bridge)
+ 		return;
+ 	}
+ 	SDE_ATRACE_END("dsi_bridge_post_disable");
++
++	msm_drm_notifier_call_chain(MSM_DRM_EVENT_BLANK, &notify_data);
+ }
+ 
+ static void dsi_bridge_mode_set(struct drm_bridge *bridge,
+-- 
+2.52.0
+

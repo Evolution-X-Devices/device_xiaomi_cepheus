@@ -1,0 +1,47 @@
+From de4d5bafac00924fbb1b3a9fea70ffa6681e4fb7 Mon Sep 17 00:00:00 2001
+From: Sebastiano Barezzi <barezzisebastiano@gmail.com>
+Date: Sun, 10 Jul 2022 16:09:00 +0200
+Subject: [PATCH 010/115] arch: arm64: boot: dts: qcom: xiaomi: vayu: Add
+ ln8000 support
+
+* Extracted from stock dtbo
+
+Change-Id: I79733a52cddc8bb011ef679bf317babb5055fe0f
+---
+ .../qcom/xiaomi/overlay/vayu/vayu-sm8150.dtsi | 20 +++++++++++++++++++
+ 1 file changed, 20 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/qcom/xiaomi/overlay/vayu/vayu-sm8150.dtsi b/arch/arm64/boot/dts/qcom/xiaomi/overlay/vayu/vayu-sm8150.dtsi
+index 795454af9..b65899889 100644
+--- a/arch/arm64/boot/dts/qcom/xiaomi/overlay/vayu/vayu-sm8150.dtsi
++++ b/arch/arm64/boot/dts/qcom/xiaomi/overlay/vayu/vayu-sm8150.dtsi
+@@ -215,6 +215,26 @@ And public attribution of xiaomi platforms(like J20S and so and)
+ 		//ti,bq2597x,sense-resistor-mohm = <2>;
+ 
+ 	};
++
++	ln8000_charger@51 {
++		compatible = "lionsemi,ln8000";
++		reg = <0x51>;
++		ln8000_charger,irq_index = <0x128>;
++		ln8000_charger,bat-ovp-threshold = <0x11d0>;
++		ln8000_charger,bat-ovp-alarm-threshold = <0x11ad>;
++		ln8000_charger,bus-ovp-threshold = <0x32c8>;
++		ln8000_charger,bus-ovp-alarm-threshold = <0x2af8>;
++		ln8000_charger,bus-ocp-threshold = <0xea6>;
++		ln8000_charger,bus-ocp-alarm-threshold = <0xdac>;
++		ln8000_charger,ntc-alarm-cfg = <0xe2>;
++		ln8000_charger,tdie-prot-disable;
++		ln8000_charger,tbus-mon-disable;
++		ln8000_charger,tbat-mon-disable;
++		ln8000_charger,iin-ocp-disable;
++		ln8000_charger,iin-reg-disable;
++		ln8000_charger,tdie-reg-disable;
++		ln8000_charger,vbat-reg-disable;
++	};
+ };
+ 
+ &soc {
+-- 
+2.52.0
+

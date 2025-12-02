@@ -1,0 +1,120 @@
+From 2bd4dc836b77b4fb840e302d14b35b1bf6af0b92 Mon Sep 17 00:00:00 2001
+From: Demon000 <demonsingur@gmail.com>
+Date: Tue, 18 Feb 2020 23:03:10 +0200
+Subject: [PATCH 030/115] arch: arm64: boot: dts: qcom: ea8076: disable dc
+ dimming during fod hbm commands
+
+Change-Id: If7d461b5f0a02118c5307b962a507269e1fdce71
+---
+ .../common/display/dsi-panel-samsung-fhd-ea8076-f1-cmd.dtsi   | 2 +-
+ .../common/display/dsi-panel-samsung-fhd-ea8076-f1mp-cmd.dtsi | 2 +-
+ .../display/dsi-panel-samsung-fhd-ea8076-f1p2-2-cmd.dtsi      | 2 +-
+ .../common/display/dsi-panel-samsung-fhd-ea8076-f1p2-cmd.dtsi | 2 +-
+ .../common/display/dsi-panel-samsung-fhd-ea8076-f1s-cmd.dtsi  | 4 ++--
+ .../overlay/common/display/dsi-panel-ss-fhd-ea8076-cmd.dtsi   | 2 +-
+ .../common/display/dsi-panel-ss-fhd-ea8076-global-cmd.dtsi    | 2 +-
+ 7 files changed, 8 insertions(+), 8 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/qcom/xiaomi/overlay/common/display/dsi-panel-samsung-fhd-ea8076-f1-cmd.dtsi b/arch/arm64/boot/dts/qcom/xiaomi/overlay/common/display/dsi-panel-samsung-fhd-ea8076-f1-cmd.dtsi
+index 36343965a..b0b7d5341 100644
+--- a/arch/arm64/boot/dts/qcom/xiaomi/overlay/common/display/dsi-panel-samsung-fhd-ea8076-f1-cmd.dtsi
++++ b/arch/arm64/boot/dts/qcom/xiaomi/overlay/common/display/dsi-panel-samsung-fhd-ea8076-f1-cmd.dtsi
+@@ -242,7 +242,7 @@
+ 					39 00 00 00 00 00 02 B0 03
+ 					39 00 00 00 00 00 02 B7 C9
+ 					39 00 00 00 00 00 02 B0 07
+-					39 00 00 00 00 00 02 B7 91
++					39 00 00 00 00 00 02 B7 11
+ 					39 00 00 00 00 00 03 F0 A5 A5
+ 					39 01 00 00 01 00 02 53 E0
+ 					39 00 00 00 00 00 03 F0 5A 5A
+diff --git a/arch/arm64/boot/dts/qcom/xiaomi/overlay/common/display/dsi-panel-samsung-fhd-ea8076-f1mp-cmd.dtsi b/arch/arm64/boot/dts/qcom/xiaomi/overlay/common/display/dsi-panel-samsung-fhd-ea8076-f1mp-cmd.dtsi
+index 76e9564aa..75bf0dd6e 100644
+--- a/arch/arm64/boot/dts/qcom/xiaomi/overlay/common/display/dsi-panel-samsung-fhd-ea8076-f1mp-cmd.dtsi
++++ b/arch/arm64/boot/dts/qcom/xiaomi/overlay/common/display/dsi-panel-samsung-fhd-ea8076-f1mp-cmd.dtsi
+@@ -242,7 +242,7 @@
+ 					39 00 00 00 00 00 02 B0 03
+ 					39 00 00 00 00 00 02 B7 C9
+ 					39 00 00 00 00 00 02 B0 07
+-					39 00 00 00 00 00 02 B7 91
++					39 00 00 00 00 00 02 B7 11
+ 					39 00 00 00 00 00 03 F0 A5 A5
+ 					39 01 00 00 01 00 02 53 E0
+ 					39 00 00 00 00 00 03 F0 5A 5A
+diff --git a/arch/arm64/boot/dts/qcom/xiaomi/overlay/common/display/dsi-panel-samsung-fhd-ea8076-f1p2-2-cmd.dtsi b/arch/arm64/boot/dts/qcom/xiaomi/overlay/common/display/dsi-panel-samsung-fhd-ea8076-f1p2-2-cmd.dtsi
+index 04444e5ac..9110a4e77 100644
+--- a/arch/arm64/boot/dts/qcom/xiaomi/overlay/common/display/dsi-panel-samsung-fhd-ea8076-f1p2-2-cmd.dtsi
++++ b/arch/arm64/boot/dts/qcom/xiaomi/overlay/common/display/dsi-panel-samsung-fhd-ea8076-f1p2-2-cmd.dtsi
+@@ -242,7 +242,7 @@
+ 					39 00 00 00 00 00 02 B0 03
+ 					39 00 00 00 00 00 02 B7 C9
+ 					39 00 00 00 00 00 02 B0 07
+-					39 00 00 00 00 00 02 B7 91
++					39 00 00 00 00 00 02 B7 11
+ 					39 00 00 00 00 00 03 F0 A5 A5
+ 					39 01 00 00 01 00 02 53 E0
+ 					39 00 00 00 00 00 03 F0 5A 5A
+diff --git a/arch/arm64/boot/dts/qcom/xiaomi/overlay/common/display/dsi-panel-samsung-fhd-ea8076-f1p2-cmd.dtsi b/arch/arm64/boot/dts/qcom/xiaomi/overlay/common/display/dsi-panel-samsung-fhd-ea8076-f1p2-cmd.dtsi
+index 76e961997..47082c5b3 100644
+--- a/arch/arm64/boot/dts/qcom/xiaomi/overlay/common/display/dsi-panel-samsung-fhd-ea8076-f1p2-cmd.dtsi
++++ b/arch/arm64/boot/dts/qcom/xiaomi/overlay/common/display/dsi-panel-samsung-fhd-ea8076-f1p2-cmd.dtsi
+@@ -242,7 +242,7 @@
+ 					39 00 00 00 00 00 02 B0 03
+ 					39 00 00 00 00 00 02 B7 C9
+ 					39 00 00 00 00 00 02 B0 07
+-					39 00 00 00 00 00 02 B7 91
++					39 00 00 00 00 00 02 B7 11
+ 					39 00 00 00 00 00 03 F0 A5 A5
+ 					39 01 00 00 01 00 02 53 E0
+ 					39 00 00 00 00 00 03 F0 5A 5A
+diff --git a/arch/arm64/boot/dts/qcom/xiaomi/overlay/common/display/dsi-panel-samsung-fhd-ea8076-f1s-cmd.dtsi b/arch/arm64/boot/dts/qcom/xiaomi/overlay/common/display/dsi-panel-samsung-fhd-ea8076-f1s-cmd.dtsi
+index d01da4830..1ece19895 100644
+--- a/arch/arm64/boot/dts/qcom/xiaomi/overlay/common/display/dsi-panel-samsung-fhd-ea8076-f1s-cmd.dtsi
++++ b/arch/arm64/boot/dts/qcom/xiaomi/overlay/common/display/dsi-panel-samsung-fhd-ea8076-f1s-cmd.dtsi
+@@ -257,7 +257,7 @@
+ 					39 00 00 00 00 00 02 B0 03
+ 					39 00 00 00 00 00 02 B7 49
+ 					39 00 00 00 00 00 02 B0 07
+-					39 00 00 00 00 00 02 B7 91
++					39 00 00 00 00 00 02 B7 11
+ 					39 01 00 00 01 00 03 F0 A5 A5];
+ 				qcom,mdss-dsi-dispparam-hbm-fod-off-command-state = "dsi_hs_mode";
+ 				qcom,mdss-dsi-dispparam-hbm-fod-on-command = [
+@@ -265,7 +265,7 @@
+ 					39 00 00 00 00 00 02 B0 03
+ 					39 00 00 00 00 00 02 B7 C9
+ 					39 00 00 00 00 00 02 B0 07
+-					39 00 00 00 00 00 02 B7 91
++					39 00 00 00 00 00 02 B7 11
+ 					39 00 00 00 00 00 03 F0 A5 A5
+ 					39 01 00 00 01 00 02 53 E0
+ 					39 00 00 00 00 00 03 F0 5A 5A
+diff --git a/arch/arm64/boot/dts/qcom/xiaomi/overlay/common/display/dsi-panel-ss-fhd-ea8076-cmd.dtsi b/arch/arm64/boot/dts/qcom/xiaomi/overlay/common/display/dsi-panel-ss-fhd-ea8076-cmd.dtsi
+index 582642725..fc1deae7f 100644
+--- a/arch/arm64/boot/dts/qcom/xiaomi/overlay/common/display/dsi-panel-ss-fhd-ea8076-cmd.dtsi
++++ b/arch/arm64/boot/dts/qcom/xiaomi/overlay/common/display/dsi-panel-ss-fhd-ea8076-cmd.dtsi
+@@ -230,7 +230,7 @@
+ 					39 00 00 00 00 00 02 B0 03
+ 					39 00 00 00 00 00 02 B7 C9
+ 					39 00 00 00 00 00 02 B0 07
+-					39 00 00 00 00 00 02 B7 91
++					39 00 00 00 00 00 02 B7 11
+ 					39 00 00 00 00 00 03 F0 A5 A5
+ 					39 01 00 00 01 00 02 53 E0
+ 					39 00 00 00 00 00 03 F0 5A 5A
+diff --git a/arch/arm64/boot/dts/qcom/xiaomi/overlay/common/display/dsi-panel-ss-fhd-ea8076-global-cmd.dtsi b/arch/arm64/boot/dts/qcom/xiaomi/overlay/common/display/dsi-panel-ss-fhd-ea8076-global-cmd.dtsi
+index 4f66145f9..1c0e690d7 100644
+--- a/arch/arm64/boot/dts/qcom/xiaomi/overlay/common/display/dsi-panel-ss-fhd-ea8076-global-cmd.dtsi
++++ b/arch/arm64/boot/dts/qcom/xiaomi/overlay/common/display/dsi-panel-ss-fhd-ea8076-global-cmd.dtsi
+@@ -230,7 +230,7 @@
+ 					39 00 00 00 00 00 02 B0 03
+ 					39 00 00 00 00 00 02 B7 C9
+ 					39 00 00 00 00 00 02 B0 07
+-					39 00 00 00 00 00 02 B7 91
++					39 00 00 00 00 00 02 B7 11
+ 					39 00 00 00 00 00 03 F0 A5 A5
+ 					39 01 00 00 01 00 02 53 E0
+ 					39 00 00 00 00 00 03 F0 5A 5A
+-- 
+2.52.0
+

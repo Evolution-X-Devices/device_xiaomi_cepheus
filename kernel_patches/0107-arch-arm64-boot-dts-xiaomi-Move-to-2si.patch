@@ -1,0 +1,39 @@
+From f10547a25e83ba58c9d3fb7829d49a8dee80ee75 Mon Sep 17 00:00:00 2001
+From: Sebastiano Barezzi <barezzisebastiano@gmail.com>
+Date: Mon, 4 Jul 2022 17:18:25 +0200
+Subject: [PATCH 107/115] arch: arm64: boot: dts: xiaomi: Move to 2si
+
+Change-Id: Iaca6c96f165cf300289761abf4e178eb64371ffd
+---
+ arch/arm64/boot/dts/qcom/xiaomi/base/sm8150.dtsi | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm64/boot/dts/qcom/xiaomi/base/sm8150.dtsi b/arch/arm64/boot/dts/qcom/xiaomi/base/sm8150.dtsi
+index bf0f93ebb..2bdfd8672 100644
+--- a/arch/arm64/boot/dts/qcom/xiaomi/base/sm8150.dtsi
++++ b/arch/arm64/boot/dts/qcom/xiaomi/base/sm8150.dtsi
+@@ -4,6 +4,12 @@
+ 	};
+ };
+ 
++&firmware {
++	android {
++		boot_devices = "soc/1d84000.ufshc";
++	};
++};
++
+ &shared_meta {
+ 	parts = "vbmeta,boot,system,vendor,dtbo";
+ };
+@@ -13,7 +19,7 @@
+ 		status = "disabled";
+ 	};
+ 	vendor {
+-		fsmgr_flags = "wait,avb";
++		status = "disabled";
+ 	};
+ };
+ 
+-- 
+2.52.0
+

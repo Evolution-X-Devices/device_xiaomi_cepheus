@@ -1,0 +1,30 @@
+From 1d27b74c8f74e1d52545941e245ccea80501f7ff Mon Sep 17 00:00:00 2001
+From: Sebastiano Barezzi <seba@sebaubuntu.dev>
+Date: Mon, 29 Jan 2024 20:59:38 +0100
+Subject: [PATCH 013/115] drivers: clk: qcom: mdss: Import Xiaomi changes
+
+Change-Id: I19de141ce55d00ea1af4473025e35e1049ede365
+---
+ drivers/clk/qcom/mdss/mdss-dsi-pll-7nm.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/drivers/clk/qcom/mdss/mdss-dsi-pll-7nm.c b/drivers/clk/qcom/mdss/mdss-dsi-pll-7nm.c
+index dacb68ca8..831db0488 100644
+--- a/drivers/clk/qcom/mdss/mdss-dsi-pll-7nm.c
++++ b/drivers/clk/qcom/mdss/mdss-dsi-pll-7nm.c
+@@ -554,6 +554,12 @@ static void dsi_pll_setup_config(struct dsi_pll_7nm *pll,
+ 	config->enable_ssc = rsc->ssc_en;
+ 	config->ssc_center = rsc->ssc_center;
+ 
++#ifdef CONFIG_MACH_XIAOMI_NABU
++	if (pll->cphy_enabled) {
++		config->enable_ssc = false;
++	}
++#endif
++
+ 	if (config->enable_ssc) {
+ 		if (rsc->ssc_freq)
+ 			config->ssc_freq = rsc->ssc_freq;
+-- 
+2.52.0
+

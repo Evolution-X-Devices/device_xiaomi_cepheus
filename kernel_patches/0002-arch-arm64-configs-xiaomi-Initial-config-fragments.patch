@@ -1,0 +1,48 @@
+From 3f40a40803f76017d2f587fde51e4e3e4ca863d7 Mon Sep 17 00:00:00 2001
+From: Sebastiano Barezzi <barezzisebastiano@gmail.com>
+Date: Wed, 22 Jun 2022 02:13:59 +0200
+Subject: [PATCH 002/115] arch: arm64: configs: xiaomi: Initial config
+ fragments
+
+Change-Id: I8a757f09beede0238c7ac53627382a4c81d54509
+---
+ arch/arm64/configs/vendor/xiaomi/andromeda.config     | 0
+ arch/arm64/configs/vendor/xiaomi/cepheus.config       | 0
+ arch/arm64/configs/vendor/xiaomi/crux.config          | 0
+ arch/arm64/configs/vendor/xiaomi/nabu.config          | 0
+ arch/arm64/configs/vendor/xiaomi/raphael.config       | 0
+ arch/arm64/configs/vendor/xiaomi/sm8150-common.config | 0
+ arch/arm64/configs/vendor/xiaomi/vayu.config          | 0
+ 7 files changed, 0 insertions(+), 0 deletions(-)
+ create mode 100644 arch/arm64/configs/vendor/xiaomi/andromeda.config
+ create mode 100644 arch/arm64/configs/vendor/xiaomi/cepheus.config
+ create mode 100644 arch/arm64/configs/vendor/xiaomi/crux.config
+ create mode 100644 arch/arm64/configs/vendor/xiaomi/nabu.config
+ create mode 100644 arch/arm64/configs/vendor/xiaomi/raphael.config
+ create mode 100644 arch/arm64/configs/vendor/xiaomi/sm8150-common.config
+ create mode 100644 arch/arm64/configs/vendor/xiaomi/vayu.config
+
+diff --git a/arch/arm64/configs/vendor/xiaomi/andromeda.config b/arch/arm64/configs/vendor/xiaomi/andromeda.config
+new file mode 100644
+index 000000000..e69de29bb
+diff --git a/arch/arm64/configs/vendor/xiaomi/cepheus.config b/arch/arm64/configs/vendor/xiaomi/cepheus.config
+new file mode 100644
+index 000000000..e69de29bb
+diff --git a/arch/arm64/configs/vendor/xiaomi/crux.config b/arch/arm64/configs/vendor/xiaomi/crux.config
+new file mode 100644
+index 000000000..e69de29bb
+diff --git a/arch/arm64/configs/vendor/xiaomi/nabu.config b/arch/arm64/configs/vendor/xiaomi/nabu.config
+new file mode 100644
+index 000000000..e69de29bb
+diff --git a/arch/arm64/configs/vendor/xiaomi/raphael.config b/arch/arm64/configs/vendor/xiaomi/raphael.config
+new file mode 100644
+index 000000000..e69de29bb
+diff --git a/arch/arm64/configs/vendor/xiaomi/sm8150-common.config b/arch/arm64/configs/vendor/xiaomi/sm8150-common.config
+new file mode 100644
+index 000000000..e69de29bb
+diff --git a/arch/arm64/configs/vendor/xiaomi/vayu.config b/arch/arm64/configs/vendor/xiaomi/vayu.config
+new file mode 100644
+index 000000000..e69de29bb
+-- 
+2.52.0
+

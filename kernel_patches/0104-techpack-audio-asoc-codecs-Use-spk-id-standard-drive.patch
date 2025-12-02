@@ -1,0 +1,185 @@
+From 5c8031afcfc081e8d543aea87efc824669b5ec5d Mon Sep 17 00:00:00 2001
+From: Sebastiano Barezzi <seba@sebaubuntu.dev>
+Date: Sun, 9 Jun 2024 19:21:31 +0200
+Subject: [PATCH 104/115] techpack: audio: asoc: codecs: Use spk-id standard
+ driver
+
+Change-Id: I4093c026405398b752b183bc4a8639e3eccf49fc
+---
+ techpack/audio/asoc/codecs/cs35l41/cs35l41.c  | 28 ----------------
+ .../audio/asoc/codecs/tas2557/tas2557-core.c  | 28 ----------------
+ .../audio/asoc/codecs/tas2557/tas2557-core.h  |  1 -
+ .../asoc/codecs/tas2557/tas2557-regmap.c      |  2 +-
+ .../audio/asoc/codecs/tfa98xx/inc/spk-id.h    | 33 -------------------
+ .../audio/asoc/codecs/tfa98xx/src/tfa98xx.c   |  2 +-
+ techpack/audio/include/uapi/sound/cs35l41.h   |  1 -
+ 7 files changed, 2 insertions(+), 93 deletions(-)
+ delete mode 100644 techpack/audio/asoc/codecs/tfa98xx/inc/spk-id.h
+
+diff --git a/techpack/audio/asoc/codecs/cs35l41/cs35l41.c b/techpack/audio/asoc/codecs/cs35l41/cs35l41.c
+index 47150d813..89b542efb 100644
+--- a/techpack/audio/asoc/codecs/cs35l41/cs35l41.c
++++ b/techpack/audio/asoc/codecs/cs35l41/cs35l41.c
+@@ -1583,34 +1583,6 @@ static struct snd_soc_codec_driver soc_codec_dev_cs35l41 = {
+ 	.idle_bias_off = true,
+ };
+ 
+-int spk_id_get(struct device_node *np)
+-{
+-	int id;
+-	int state;
+-
+-	state = spk_id_get_pin_3state(np);
+-	if (state < 0) {
+-		pr_err("%s: Can not get id pin state, %d\n", __func__, state);
+-		return VENDOR_ID_NONE;
+-	}
+-
+-	switch (state) {
+-	case PIN_PULL_DOWN:
+-		id = VENDOR_ID_AAC;
+-		break;
+-	case PIN_PULL_UP:
+-		id = VENDOR_ID_UNKNOWN;
+-		break;
+-	case PIN_FLOAT:
+-		id = VENDOR_ID_GOER;
+-		break;
+-	default:
+-		id = VENDOR_ID_UNKNOWN;
+-		break;
+-	}
+-	return id;
+-}
+-
+ static int cs35l41_handle_of_data(struct device *dev,
+ 				  struct cs35l41_platform_data *pdata)
+ {
+diff --git a/techpack/audio/asoc/codecs/tas2557/tas2557-core.c b/techpack/audio/asoc/codecs/tas2557/tas2557-core.c
+index 45f6e9b32..5eaa3bdcb 100644
+--- a/techpack/audio/asoc/codecs/tas2557/tas2557-core.c
++++ b/techpack/audio/asoc/codecs/tas2557/tas2557-core.c
+@@ -2309,34 +2309,6 @@ bool tas2557_get_Cali_prm_r0(struct tas2557_priv *pTAS2557, int *prm_r0)
+ 	return bFound;
+ }
+ 
+-int spk_id_get(struct device_node *np)
+-{
+-	int id;
+-	int state;
+-
+-	state = spk_id_get_pin_3state(np);
+-	if (state < 0) {
+-		pr_err("%s: Can not get id pin state, %d\n", __func__, state);
+-		return VENDOR_ID_NONE;
+-	}
+-
+-	switch (state) {
+-	case PIN_PULL_DOWN:
+-		id = VENDOR_ID_AAC;
+-		break;
+-	case PIN_PULL_UP:
+-		id = VENDOR_ID_UNKNOWN;
+-		break;
+-	case PIN_FLOAT:
+-		id = VENDOR_ID_GOER;
+-		break;
+-	default:
+-		id = VENDOR_ID_UNKNOWN;
+-		break;
+-	}
+-	return id;
+-}
+-
+ int tas2557_parse_dt(struct device *dev, struct tas2557_priv *pTAS2557)
+ {
+ 	struct device_node *np = dev->of_node;
+diff --git a/techpack/audio/asoc/codecs/tas2557/tas2557-core.h b/techpack/audio/asoc/codecs/tas2557/tas2557-core.h
+index 95a544f45..a3e6df6e3 100644
+--- a/techpack/audio/asoc/codecs/tas2557/tas2557-core.h
++++ b/techpack/audio/asoc/codecs/tas2557/tas2557-core.h
+@@ -81,6 +81,5 @@ int tas2557_parse_dt(struct device *dev, struct tas2557_priv *pTAS2557);
+ int tas2557_get_DAC_gain(struct tas2557_priv *pTAS2557, unsigned char *pnGain);
+ int tas2557_set_DAC_gain(struct tas2557_priv *pTAS2557, unsigned int nGain);
+ int tas2557_configIRQ(struct tas2557_priv *pTAS2557);
+-int spk_id_get(struct device_node *np);
+ 
+ #endif /* _TAS2557_CORE_H */
+diff --git a/techpack/audio/asoc/codecs/tas2557/tas2557-regmap.c b/techpack/audio/asoc/codecs/tas2557/tas2557-regmap.c
+index 9923660ef..2f66744d8 100644
+--- a/techpack/audio/asoc/codecs/tas2557/tas2557-regmap.c
++++ b/techpack/audio/asoc/codecs/tas2557/tas2557-regmap.c
+@@ -56,7 +56,7 @@
+ #ifdef ENABLE_TILOAD
+ #include "tiload.h"
+ #endif
+-#include "../spk-id.h"
++#include <linux/mfd/spk-id.h>
+ 
+ #define LOW_TEMPERATURE_GAIN 6
+ #define LOW_TEMPERATURE_COUNTER 12
+diff --git a/techpack/audio/asoc/codecs/tfa98xx/inc/spk-id.h b/techpack/audio/asoc/codecs/tfa98xx/inc/spk-id.h
+deleted file mode 100644
+index 8303b93c3..000000000
+--- a/techpack/audio/asoc/codecs/tfa98xx/inc/spk-id.h
++++ /dev/null
+@@ -1,33 +0,0 @@
+-/* Copyright (c) 2016, The Linux Foundation. All rights reserved.
+- * Copyright (C) 2019 XiaoMi, Inc.
+- *
+- * This program is free software; you can redistribute it and/or modify
+- * it under the terms of the GNU General Public License version 2 and
+- * only version 2 as published by the Free Software Foundation.
+- *
+- * This program is distributed in the hope that it will be useful,
+- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- * GNU General Public License for more details.
+- */
+-
+-#ifndef __SPK_ID_H_
+-#define __SPK_ID_H_
+-
+-#include <linux/types.h>
+-#include <linux/of.h>
+-
+-#define PIN_PULL_DOWN 0
+-#define PIN_PULL_UP 1
+-#define PIN_FLOAT 2
+-
+-#define VENDOR_ID_NONE 0
+-#define VENDOR_ID_AAC 1
+-#define VENDOR_ID_SSI 2
+-#define VENDOR_ID_GOER 3
+-
+-#define VENDOR_ID_UNKNOWN 4
+-
+-extern int spk_id_get_pin_3state(struct device_node *np);
+-
+-#endif
+diff --git a/techpack/audio/asoc/codecs/tfa98xx/src/tfa98xx.c b/techpack/audio/asoc/codecs/tfa98xx/src/tfa98xx.c
+index 384d2e54b..d6f094725 100644
+--- a/techpack/audio/asoc/codecs/tfa98xx/src/tfa98xx.c
++++ b/techpack/audio/asoc/codecs/tfa98xx/src/tfa98xx.c
+@@ -40,7 +40,7 @@
+ /* required for enum tfa9912_irq */
+ #include "../inc/tfa98xx_tfafieldnames.h"
+ 
+-#include "../inc/spk-id.h"
++#include <linux/mfd/spk-id.h>
+ 
+ #define TFA98XX_VERSION TFA98XX_API_REV_STR
+ 
+diff --git a/techpack/audio/include/uapi/sound/cs35l41.h b/techpack/audio/include/uapi/sound/cs35l41.h
+index 39f6df1a1..17d02a568 100644
+--- a/techpack/audio/include/uapi/sound/cs35l41.h
++++ b/techpack/audio/include/uapi/sound/cs35l41.h
+@@ -80,5 +80,4 @@ struct cs35l41_private {
+ 
+ int cs35l41_probe(struct cs35l41_private *cs35l41,
+ 		  struct cs35l41_platform_data *pdata);
+-int spk_id_get(struct device_node *np);
+ #endif /* __CS35L41_H */
+-- 
+2.52.0
+

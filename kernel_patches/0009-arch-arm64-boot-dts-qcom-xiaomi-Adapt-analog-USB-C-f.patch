@@ -1,0 +1,205 @@
+From 82c00b8671bfe9d6cbe46e7ff37f1e1e769c076a Mon Sep 17 00:00:00 2001
+From: Sebastiano Barezzi <barezzisebastiano@gmail.com>
+Date: Thu, 23 Jun 2022 03:27:16 +0200
+Subject: [PATCH 009/115] arch: arm64: boot: dts: qcom: xiaomi: Adapt analog
+ USB-C for newer audio drivers
+
+Change-Id: Icb4ca6cadf5caed7d79dd04a4291fee98d4dca35
+---
+ .../boot/dts/qcom/xiaomi/base/sm8150-pinctrl.dtsi |  6 +++---
+ .../andromeda/andromeda-audio-overlay.dtsi        | 15 ++++++++++-----
+ .../overlay/andromeda/andromeda-pinctrl.dtsi      |  6 +++---
+ .../overlay/cepheus/cepheus-audio-overlay.dtsi    | 15 ++++++++++-----
+ .../xiaomi/overlay/crux/crux-audio-overlay.dtsi   | 15 ++++++++++-----
+ .../qcom/xiaomi/overlay/crux/crux-pinctrl.dtsi    |  6 +++---
+ 6 files changed, 39 insertions(+), 24 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/qcom/xiaomi/base/sm8150-pinctrl.dtsi b/arch/arm64/boot/dts/qcom/xiaomi/base/sm8150-pinctrl.dtsi
+index 444d383a0..ec7306e17 100644
+--- a/arch/arm64/boot/dts/qcom/xiaomi/base/sm8150-pinctrl.dtsi
++++ b/arch/arm64/boot/dts/qcom/xiaomi/base/sm8150-pinctrl.dtsi
+@@ -118,8 +118,8 @@
+ 		};
+ 	};
+ 
+-	wcd_usbc_analog_en2 {
+-		wcd_usbc_analog_en2_idle: wcd_usbc_ana_en2_idle {
++	wcd_usbc_analog_en2n {
++		wcd_usbc_analog_en2n_idle: wcd_usbc_ana_en2n_idle {
+ 			mux {
+ 				pins = "gpio58";
+ 				function = "gpio";
+@@ -132,7 +132,7 @@
+ 			};
+ 		};
+ 
+-		wcd_usbc_analog_en2_active: wcd_usbc_ana_en2_active {
++		wcd_usbc_analog_en2n_active: wcd_usbc_ana_en2n_active {
+ 			mux {
+ 				pins = "gpio58";
+ 				function = "gpio";
+diff --git a/arch/arm64/boot/dts/qcom/xiaomi/overlay/andromeda/andromeda-audio-overlay.dtsi b/arch/arm64/boot/dts/qcom/xiaomi/overlay/andromeda/andromeda-audio-overlay.dtsi
+index a243e7d41..b3ea6495b 100644
+--- a/arch/arm64/boot/dts/qcom/xiaomi/overlay/andromeda/andromeda-audio-overlay.dtsi
++++ b/arch/arm64/boot/dts/qcom/xiaomi/overlay/andromeda/andromeda-audio-overlay.dtsi
+@@ -37,18 +37,16 @@
+ 	qcom,adc2-switch-gpio = <&adc2_switch_gpio>;
+ 	qcom,msm-mbhc-usbc-audio-supported = <1>;
+ 	qcom,fsa4476-gpio-support = <1>;
+-	qcom,usbc-analog-en1-gpio = <&wcd_usbc_analog_en1_gpio>;
++	qcom,usbc-analog-en1_gpio = <&wcd_usbc_analog_en1_gpio>;
++	qcom,usbc-analog-en2_n_gpio = <&wcd_usbc_analog_en2n_gpio>;
+ 	qcom,usbc-analog-en2-gpio = <&tlmm 35 0>;
+ 
+ 	pinctrl-names = "quat_mi2s_enable", "quat_mi2s_disable",
+-		"quat_tdm_enable", "quat_tdm_disable",
+-		"aud_active", "aud_sleep";
++		"quat_tdm_enable", "quat_tdm_disable";
+ 	pinctrl-0 = <&quat_mi2s_active &quat_mi2s_sd0_active &quat_mi2s_sd1_active>;
+ 	pinctrl-1 = <&quat_mi2s_sleep &quat_mi2s_sd0_sleep &quat_mi2s_sd1_sleep>;
+ 	pinctrl-2 = <&quat_tdm_active &quat_tdm_dout_active>;
+ 	pinctrl-3 = <&quat_tdm_sleep &quat_tdm_dout_sleep>;
+-	pinctrl-4 = <&wcd_usbc_analog_en2_active>;
+-	pinctrl-5 = <&wcd_usbc_analog_en2_idle>;
+ };
+ 
+ &soc {
+@@ -73,4 +71,11 @@
+ 		pinctrl-1 = <&wcd_usbc_analog_en1_idle>;
+ 	};
+ 
++	wcd_usbc_analog_en2n_gpio: msm_cdc_pinctrl_usbc_audio_en2 {
++		compatible = "qcom,msm-cdc-pinctrl";
++		pinctrl-names = "aud_active", "aud_sleep";
++		pinctrl-0 = <&wcd_usbc_analog_en2n_active>;
++		pinctrl-1 = <&wcd_usbc_analog_en2n_idle>;
++	};
++
+ };
+diff --git a/arch/arm64/boot/dts/qcom/xiaomi/overlay/andromeda/andromeda-pinctrl.dtsi b/arch/arm64/boot/dts/qcom/xiaomi/overlay/andromeda/andromeda-pinctrl.dtsi
+index 6bf9122c3..309558a92 100644
+--- a/arch/arm64/boot/dts/qcom/xiaomi/overlay/andromeda/andromeda-pinctrl.dtsi
++++ b/arch/arm64/boot/dts/qcom/xiaomi/overlay/andromeda/andromeda-pinctrl.dtsi
+@@ -391,8 +391,8 @@
+ 		};
+ 	};
+ 
+-	wcd_usbc_analog_en2 {
+-		wcd_usbc_analog_en2_idle: wcd_usbc_ana_en2_idle {
++	wcd_usbc_analog_en2n {
++		wcd_usbc_analog_en2n_idle: wcd_usbc_ana_en2n_idle {
+ 			mux {
+ 				pins = "gpio35";
+ 				function = "gpio";
+@@ -405,7 +405,7 @@
+ 			};
+ 		};
+ 
+-		wcd_usbc_analog_en2_active: wcd_usbc_ana_en2_active {
++		wcd_usbc_analog_en2n_active: wcd_usbc_ana_en2n_active {
+ 			mux {
+ 				pins = "gpio35";
+ 				function = "gpio";
+diff --git a/arch/arm64/boot/dts/qcom/xiaomi/overlay/cepheus/cepheus-audio-overlay.dtsi b/arch/arm64/boot/dts/qcom/xiaomi/overlay/cepheus/cepheus-audio-overlay.dtsi
+index 7877060e5..d36f44af1 100644
+--- a/arch/arm64/boot/dts/qcom/xiaomi/overlay/cepheus/cepheus-audio-overlay.dtsi
++++ b/arch/arm64/boot/dts/qcom/xiaomi/overlay/cepheus/cepheus-audio-overlay.dtsi
+@@ -38,18 +38,16 @@
+ 	qcom,adc2-switch-gpio = <&adc2_switch_gpio>;
+ 	qcom,msm-mbhc-usbc-audio-supported = <1>;
+ 	qcom,fsa4476-gpio-support = <1>;
+-	qcom,usbc-analog-en1-gpio = <&wcd_usbc_analog_en1_gpio>;
++	qcom,usbc-analog-en1_gpio = <&wcd_usbc_analog_en1_gpio>;
++	qcom,usbc-analog-en2_n_gpio = <&wcd_usbc_analog_en2n_gpio>;
+ 	qcom,usbc-analog-en2-gpio = <&tlmm 58 0>;
+ 
+ 	pinctrl-names = "quat_mi2s_enable", "quat_mi2s_disable",
+-			"quat_tdm_enable", "quat_tdm_disable",
+-			"aud_active", "aud_sleep";
++			"quat_tdm_enable", "quat_tdm_disable";
+ 	pinctrl-0 = <&quat_mi2s_active &quat_mi2s_sd0_active &quat_mi2s_sd1_active>;
+ 	pinctrl-1 = <&quat_mi2s_sleep &quat_mi2s_sd0_sleep &quat_mi2s_sd1_sleep>;
+ 	pinctrl-2 = <&quat_tdm_active &quat_tdm_dout_active>;
+ 	pinctrl-3 = <&quat_tdm_sleep &quat_tdm_dout_sleep>;
+-	pinctrl-4 = <&wcd_usbc_analog_en2_active>;
+-	pinctrl-5 = <&wcd_usbc_analog_en2_idle>;
+ };
+ 
+ &soc {
+@@ -73,4 +71,11 @@
+ 		pinctrl-0 = <&wcd_usbc_analog_en1_active>;
+ 		pinctrl-1 = <&wcd_usbc_analog_en1_idle>;
+ 	};
++
++	wcd_usbc_analog_en2n_gpio: msm_cdc_pinctrl_usbc_audio_en2 {
++		compatible = "qcom,msm-cdc-pinctrl";
++		pinctrl-names = "aud_active", "aud_sleep";
++		pinctrl-0 = <&wcd_usbc_analog_en2n_active>;
++		pinctrl-1 = <&wcd_usbc_analog_en2n_idle>;
++	};
+ };
+diff --git a/arch/arm64/boot/dts/qcom/xiaomi/overlay/crux/crux-audio-overlay.dtsi b/arch/arm64/boot/dts/qcom/xiaomi/overlay/crux/crux-audio-overlay.dtsi
+index 5d5c47156..810462198 100644
+--- a/arch/arm64/boot/dts/qcom/xiaomi/overlay/crux/crux-audio-overlay.dtsi
++++ b/arch/arm64/boot/dts/qcom/xiaomi/overlay/crux/crux-audio-overlay.dtsi
+@@ -36,18 +36,16 @@
+ 	/* qcom,adc2-switch-gpio = <&adc2_switch_gpio>; */
+ 	qcom,msm-mbhc-usbc-audio-supported = <1>;
+ 	qcom,fsa4476-gpio-support = <1>;
+-	qcom,usbc-analog-en1-gpio = <&wcd_usbc_analog_en1_gpio>;
++	qcom,usbc-analog-en1_gpio = <&wcd_usbc_analog_en1_gpio>;
++	qcom,usbc-analog-en2_n_gpio = <&wcd_usbc_analog_en2n_gpio>;
+ 	qcom,usbc-analog-en2-gpio = <&tlmm 32 0>;
+ 
+ 	pinctrl-names = "quat_mi2s_enable", "quat_mi2s_disable",
+-			"quat_tdm_enable", "quat_tdm_disable",
+-			"aud_active", "aud_sleep";
++			"quat_tdm_enable", "quat_tdm_disable";
+ 	pinctrl-0 = <&quat_mi2s_active &quat_mi2s_sd0_active &quat_mi2s_sd1_active>;
+ 	pinctrl-1 = <&quat_mi2s_sleep &quat_mi2s_sd0_sleep &quat_mi2s_sd1_sleep>;
+ 	pinctrl-2 = <&quat_tdm_active &quat_tdm_dout_active>;
+ 	pinctrl-3 = <&quat_tdm_sleep &quat_tdm_dout_sleep>;
+-	pinctrl-4 = <&wcd_usbc_analog_en2_active>;
+-	pinctrl-5 = <&wcd_usbc_analog_en2_idle>;
+ };
+ 
+ &soc {
+@@ -71,4 +69,11 @@
+ 		pinctrl-0 = <&wcd_usbc_analog_en1_active>;
+ 		pinctrl-1 = <&wcd_usbc_analog_en1_idle>;
+ 	};
++
++	wcd_usbc_analog_en2n_gpio: msm_cdc_pinctrl_usbc_audio_en2 {
++		compatible = "qcom,msm-cdc-pinctrl";
++		pinctrl-names = "aud_active", "aud_sleep";
++		pinctrl-0 = <&wcd_usbc_analog_en2n_active>;
++		pinctrl-1 = <&wcd_usbc_analog_en2n_idle>;
++	};
+ };
+diff --git a/arch/arm64/boot/dts/qcom/xiaomi/overlay/crux/crux-pinctrl.dtsi b/arch/arm64/boot/dts/qcom/xiaomi/overlay/crux/crux-pinctrl.dtsi
+index 4155e541e..110698022 100644
+--- a/arch/arm64/boot/dts/qcom/xiaomi/overlay/crux/crux-pinctrl.dtsi
++++ b/arch/arm64/boot/dts/qcom/xiaomi/overlay/crux/crux-pinctrl.dtsi
+@@ -505,8 +505,8 @@
+ 		};
+ 	};
+ 
+-	wcd_usbc_analog_en2 {
+-		wcd_usbc_analog_en2_idle: wcd_usbc_ana_en2_idle {
++	wcd_usbc_analog_en2n {
++		wcd_usbc_analog_en2n_idle: wcd_usbc_ana_en2n_idle {
+ 			mux {
+ 				pins = "gpio32";
+ 				function = "gpio";
+@@ -519,7 +519,7 @@
+ 			};
+ 		};
+ 
+-		wcd_usbc_analog_en2_active: wcd_usbc_ana_en2_active {
++		wcd_usbc_analog_en2n_active: wcd_usbc_ana_en2n_active {
+ 			mux {
+ 				pins = "gpio32";
+ 				function = "gpio";
+-- 
+2.52.0
+

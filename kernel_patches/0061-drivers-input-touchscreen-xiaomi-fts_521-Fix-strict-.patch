@@ -1,0 +1,45 @@
+From a6479f9483362ca96aa015e5a42ee1536907bd62 Mon Sep 17 00:00:00 2001
+From: Yumi Yukimura <me.cafebabe@gmail.com>
+Date: Wed, 7 Feb 2024 23:57:30 +0800
+Subject: [PATCH 061/115] drivers: input: touchscreen: xiaomi: fts_521: Fix
+ strict-prototypes error
+
+Change-Id: Iddba34c831a691f4b6f5e3bb8a2ddf178f89f965
+---
+ drivers/input/touchscreen/xiaomi/fts_521/fts_lib/ftsIO.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/input/touchscreen/xiaomi/fts_521/fts_lib/ftsIO.c b/drivers/input/touchscreen/xiaomi/fts_521/fts_lib/ftsIO.c
+index 9c24d5293..4e328b914 100644
+--- a/drivers/input/touchscreen/xiaomi/fts_521/fts_lib/ftsIO.c
++++ b/drivers/input/touchscreen/xiaomi/fts_521/fts_lib/ftsIO.c
+@@ -101,7 +101,7 @@ int changeSAD(u8 sad)
+ * Retrieve the pointer to the device struct of the IC
+ * @return a the device struct pointer if client was previously set or NULL in all the other cases
+ */
+-struct device *getDev()
++struct device *getDev(void)
+ {
+ 	if (client != NULL)
+ 		return &(getClient()->dev);
+@@ -114,7 +114,7 @@ struct device *getDev()
+ * Retrieve the pointer of the i2c_client struct representing the IC as i2c slave
+ * @return client if it was previously set or NULL in all the other cases
+ */
+-struct i2c_client *getClient()
++struct i2c_client *getClient(void)
+ {
+ 	if (client != NULL)
+ 		return (struct i2c_client *)client;
+@@ -126,7 +126,7 @@ struct i2c_client *getClient()
+ * Retrieve the pointer of the spi_device struct representing the IC as spi slave
+ * @return client if it was previously set or NULL in all the other cases
+ */
+-struct spi_device *getClient()
++struct spi_device *getClient(void)
+ {
+ 	if (client != NULL)
+ 		return (struct spi_device *)client;
+-- 
+2.52.0
+

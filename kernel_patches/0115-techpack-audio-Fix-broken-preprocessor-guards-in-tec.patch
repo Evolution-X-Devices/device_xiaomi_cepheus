@@ -1,0 +1,114 @@
+From ffff8042df49ee1af818f6f96eb2c8d55278ce03 Mon Sep 17 00:00:00 2001
+From: armdebug <armdebug@protonmail.com>
+Date: Sat, 28 Jun 2025 08:19:28 -0400
+Subject: [PATCH 115/115] techpack: audio: Fix broken preprocessor guards in
+ techpack import
+
+Change-Id: I023b0ee9ead67fb334b29ef463c52376fb260d51
+---
+ techpack/audio/asoc/codecs/wcd-dsp-mgr.c |  7 +++--
+ techpack/audio/asoc/sm8150.c             | 34 ++----------------------
+ techpack/audio/dsp/elliptic/Makefile     |  2 +-
+ techpack/audio/dsp/mius/Makefile         |  2 +-
+ 4 files changed, 9 insertions(+), 36 deletions(-)
+
+diff --git a/techpack/audio/asoc/codecs/wcd-dsp-mgr.c b/techpack/audio/asoc/codecs/wcd-dsp-mgr.c
+index 4e1312e05..321f70709 100644
+--- a/techpack/audio/asoc/codecs/wcd-dsp-mgr.c
++++ b/techpack/audio/asoc/codecs/wcd-dsp-mgr.c
+@@ -450,9 +450,12 @@ static int wdsp_download_segments(struct wdsp_mgr_priv *wdsp,
+ 	if (type == WDSP_ELF_FLAG_RE) {
+ 		wdsp_broadcast_event_downseq(wdsp, post, NULL);
+ 		ret = 0;
+-	} else
+-#endif
++	} else {
++		wdsp_broadcast_event_downseq(wdsp, WDSP_EVENT_DLOAD_FAILED, NULL);
++	}
++#else
+ 	wdsp_broadcast_event_downseq(wdsp, WDSP_EVENT_DLOAD_FAILED, NULL);
++#endif
+ 	return ret;
+ }
+ 
+diff --git a/techpack/audio/asoc/sm8150.c b/techpack/audio/asoc/sm8150.c
+index 634b2da74..28fdf2155 100644
+--- a/techpack/audio/asoc/sm8150.c
++++ b/techpack/audio/asoc/sm8150.c
+@@ -6263,38 +6263,7 @@ static struct snd_soc_dai_link msm_common_misc_fe_dai_links[] = {
+ 		.ignore_pmdown_time = 1,
+ 		.id = MSM_FRONTEND_DAI_MULTIMEDIA31,
+ 	},
+-#if !(defined(CONFIG_MACH_XIAOMI_VAYU) || defined(CONFIG_MACH_XIAOMI_NABU))
+-	{
+-		.name = "Quaternary MI2S_RX Hostless Playback",
+-		.stream_name = "Quaternary MI2S_RX Hostless Playback",
+-		.cpu_dai_name = "QUAT_MI2S_RX_HOSTLESS",
+-		.platform_name = "msm-pcm-hostless",
+-		.dynamic = 1,
+-		.dpcm_playback = 1,
+-		.trigger = {SND_SOC_DPCM_TRIGGER_POST,
+-			SND_SOC_DPCM_TRIGGER_POST},
+-		.no_host_mode = SND_SOC_DAI_LINK_NO_HOST,
+-		.ignore_suspend = 1,
+-		.ignore_pmdown_time = 1,
+-		.codec_dai_name = "snd-soc-dummy-dai",
+-		.codec_name = "snd-soc-dummy",
+-	},
+-	{
+-		.name = "Quaternary MI2S_TX Hostless Capture",
+-		.stream_name = "Quaternary MI2S_TX Hostless Capture",
+-		.cpu_dai_name = "QUAT_MI2S_TX_HOSTLESS",
+-		.platform_name = "msm-pcm-hostless",
+-		.dynamic = 1,
+-		.dpcm_capture = 1,
+-		.trigger = {SND_SOC_DPCM_TRIGGER_POST,
+-			SND_SOC_DPCM_TRIGGER_POST},
+-		.no_host_mode = SND_SOC_DAI_LINK_NO_HOST,
+-		.ignore_suspend = 1,
+-		.ignore_pmdown_time = 1,
+-		.codec_dai_name = "snd-soc-dummy-dai",
+-		.codec_name = "snd-soc-dummy",
+-	},
+-#endif
++#if defined(CONFIG_MACH_XIAOMI_VAYU) || defined(CONFIG_MACH_XIAOMI_NABU)
+ /* Voice Stub */
+ 	{
+ 		.name = "Voice Stub",
+@@ -6313,6 +6282,7 @@ static struct snd_soc_dai_link msm_common_misc_fe_dai_links[] = {
+ 		.codec_dai_name = "snd-soc-dummy-dai",
+ 		.codec_name = "snd-soc-dummy",
+ 	},
++#endif
+ };
+ 
+ static struct snd_soc_dai_link msm_common_be_dai_links[] = {
+diff --git a/techpack/audio/dsp/elliptic/Makefile b/techpack/audio/dsp/elliptic/Makefile
+index b31a89b24..5ceaf66a7 100644
+--- a/techpack/audio/dsp/elliptic/Makefile
++++ b/techpack/audio/dsp/elliptic/Makefile
+@@ -7,7 +7,7 @@ IO_MODULE := msm
+ LINUXINCLUDE += \
+              -I$(srctree)techpack/audio/include/dsp
+              -I$(srctree)techpack/audio/include/uapi
+-             -I$(srctree)techpack/aduio/include
++             -I$(srctree)techpack/audio/include
+ 
+ obj-y += elliptic.o
+ obj-y += elliptic_mixer_controls.o
+diff --git a/techpack/audio/dsp/mius/Makefile b/techpack/audio/dsp/mius/Makefile
+index 1a0cd5f46..4f5353e1a 100644
+--- a/techpack/audio/dsp/mius/Makefile
++++ b/techpack/audio/dsp/mius/Makefile
+@@ -7,7 +7,7 @@ IO_MODULE := msm
+ LINUXINCLUDE += \
+              -I$(srctree)techpack/audio/include/dsp
+              -I$(srctree)techpack/audio/include/uapi
+-             -I$(srctree)techpack/aduio/include
++             -I$(srctree)techpack/audio/include
+ 
+ obj-y += mius.o
+ obj-y += mius_mixer_controls.o
+-- 
+2.52.0
+

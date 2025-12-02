@@ -1,0 +1,30 @@
+From 23bf4a90af2367c4d05e02ae73d3065f22cbc44d Mon Sep 17 00:00:00 2001
+From: Demon000 <demonsingur@gmail.com>
+Date: Mon, 25 May 2020 13:21:16 +0200
+Subject: [PATCH 021/115] drivers: gpu: drm: msm: dsi-staging: add
+ dsi_panel_get_backlight
+
+Change-Id: Ifab7f9b0a7fbe5846c24c611a16cfcb7f29684dc
+---
+ drivers/gpu/drm/msm/dsi-staging/dsi_panel.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/drivers/gpu/drm/msm/dsi-staging/dsi_panel.c b/drivers/gpu/drm/msm/dsi-staging/dsi_panel.c
+index fa54a98cb..426444d87 100644
+--- a/drivers/gpu/drm/msm/dsi-staging/dsi_panel.c
++++ b/drivers/gpu/drm/msm/dsi-staging/dsi_panel.c
+@@ -689,6 +689,11 @@ static int dsi_panel_update_pwm_backlight(struct dsi_panel *panel,
+ 	return rc;
+ }
+ 
++static u32 dsi_panel_get_backlight(struct dsi_panel *panel)
++{
++	return panel->bl_config.bl_level;
++}
++
+ int dsi_panel_set_backlight(struct dsi_panel *panel, u32 bl_lvl)
+ {
+ 	int rc = 0;
+-- 
+2.52.0
+

@@ -1,0 +1,435 @@
+From 65e7544edb37c92f261d07fc6166b33022c140ad Mon Sep 17 00:00:00 2001
+From: Sebastiano Barezzi <barezzisebastiano@gmail.com>
+Date: Wed, 22 Jun 2022 19:43:31 +0200
+Subject: [PATCH 092/115] drivers: thermal: Import Xiaomi changes
+
+Change-Id: I990d079bb5611fa83cdeb467a11f14e72a4cd80f
+---
+ drivers/thermal/cpu_cooling.c  |  56 ++++++++
+ drivers/thermal/thermal_core.c | 229 +++++++++++++++++++++++++++++++++
+ include/linux/cpu_cooling.h    |   4 +
+ 3 files changed, 289 insertions(+)
+
+diff --git a/drivers/thermal/cpu_cooling.c b/drivers/thermal/cpu_cooling.c
+index 786a9e2c4..b31416a55 100644
+--- a/drivers/thermal/cpu_cooling.c
++++ b/drivers/thermal/cpu_cooling.c
+@@ -300,7 +300,11 @@ static int cpufreq_thermal_notifier(struct notifier_block *nb,
+ 	unsigned long clipped_freq = ULONG_MAX, floor_freq = 0;
+ 	struct cpufreq_cooling_device *cpufreq_cdev;
+ 
++#ifdef CONFIG_MACH_XIAOMI_SM8150
++	if (event != CPUFREQ_THERMAL)
++#else
+ 	if (event != CPUFREQ_INCOMPATIBLE)
++#endif
+ 		return NOTIFY_DONE;
+ 
+ 	mutex_lock(&cooling_list_lock);
+@@ -331,13 +335,45 @@ static int cpufreq_thermal_notifier(struct notifier_block *nb,
+ 	 * Similarly, if policy minimum set by the user is less than
+ 	 * the floor_frequency, then adjust the policy->min.
+ 	 */
++#ifdef CONFIG_MACH_XIAOMI_SM8150
++	cpufreq_verify_within_limits(policy, floor_freq, clipped_freq);
++#else
+ 	if (policy->max > clipped_freq || policy->min < floor_freq)
+ 		cpufreq_verify_within_limits(policy, floor_freq, clipped_freq);
++#endif
+ 	mutex_unlock(&cooling_list_lock);
+ 
+ 	return NOTIFY_OK;
+ }
+ 
++#ifdef CONFIG_MACH_XIAOMI_SM8150
++void cpu_limits_set_level(unsigned int cpu, unsigned int max_freq)
++{
++	struct cpufreq_cooling_device *cpufreq_cdev;
++	struct thermal_cooling_device *cdev;
++	unsigned int cdev_cpu;
++	unsigned int level;
++
++	list_for_each_entry(cpufreq_cdev, &cpufreq_cdev_list, node) {
++		sscanf(cpufreq_cdev->cdev->type, "thermal-cpufreq-%d", &cdev_cpu);
++		if (cdev_cpu == cpu) {
++			for (level = 0; level < cpufreq_cdev->max_level; level++) {
++				int target_freq = cpufreq_cdev->freq_table[level].frequency;
++				if (max_freq >= target_freq) {
++					cdev = cpufreq_cdev->cdev;
++					if (cdev)
++						cdev->ops->set_cur_state(cdev, level);
++
++					break;
++				}
++			}
++
++			break;
++		}
++	}
++}
++#endif
++
+ /**
+  * update_freq_table() - Update the freq table with power numbers
+  * @cpufreq_cdev:	the cpufreq cooling device in which to update the table
+@@ -674,7 +710,11 @@ static int cpufreq_set_cur_state(struct thermal_cooling_device *cdev,
+ 
+ 	/* Request state should be less than max_level */
+ 	if (WARN_ON(state > cpufreq_cdev->max_level))
++#ifdef CONFIG_MACH_XIAOMI_SM8150
++		state = cpufreq_cdev->max_level;
++#else
+ 		return -EINVAL;
++#endif
+ 
+ 	/* Check if the old cooling action is same as new cooling action */
+ 	if (cpufreq_cdev->cpufreq_state == state)
+@@ -720,6 +760,11 @@ static int cpufreq_set_cur_state(struct thermal_cooling_device *cdev,
+ 	cpufreq_cdev->cpufreq_state = state;
+ 	cpufreq_cdev->clipped_freq = clip_freq;
+ 
++#ifdef CONFIG_MACH_XIAOMI_SM8150
++	get_online_cpus();
++	cpufreq_update_policy(cpu);
++	put_online_cpus();
++#else
+ 	/* Check if the device has a platform mitigation function that
+ 	 * can handle the CPU freq mitigation, if not, notify cpufreq
+ 	 * framework.
+@@ -731,6 +776,7 @@ static int cpufreq_set_cur_state(struct thermal_cooling_device *cdev,
+ 	} else {
+ 		cpufreq_update_policy(cpu);
+ 	}
++#endif
+ 
+ 	return 0;
+ }
+@@ -1087,7 +1133,11 @@ __cpufreq_cooling_register(struct device_node *np,
+ 	list_add(&cpufreq_cdev->node, &cpufreq_cdev_list);
+ 	mutex_unlock(&cooling_list_lock);
+ 
++#ifdef CONFIG_MACH_XIAOMI_SM8150
++	if (first)
++#else
+ 	if (first && !cpufreq_cdev->plat_ops)
++#endif
+ 		cpufreq_register_notifier(&thermal_cpufreq_notifier_block,
+ 					  CPUFREQ_POLICY_NOTIFIER);
+ 	if (!cpuhp_registered) {
+@@ -1280,10 +1330,16 @@ void cpufreq_cooling_unregister(struct thermal_cooling_device *cdev)
+ 
+ 	if (last) {
+ 		unregister_pm_notifier(&cpufreq_cooling_pm_nb);
++#ifdef CONFIG_MACH_XIAOMI_SM8150
++		cpufreq_unregister_notifier(
++				&thermal_cpufreq_notifier_block,
++				CPUFREQ_POLICY_NOTIFIER);
++#else
+ 		if (!cpufreq_cdev->plat_ops)
+ 			cpufreq_unregister_notifier(
+ 					&thermal_cpufreq_notifier_block,
+ 					CPUFREQ_POLICY_NOTIFIER);
++#endif
+ 	}
+ 
+ 	thermal_cooling_device_unregister(cpufreq_cdev->cdev);
+diff --git a/drivers/thermal/thermal_core.c b/drivers/thermal/thermal_core.c
+index 6df9a1c24..9d769e1c4 100644
+--- a/drivers/thermal/thermal_core.c
++++ b/drivers/thermal/thermal_core.c
+@@ -25,6 +25,13 @@
+ #include <net/netlink.h>
+ #include <net/genetlink.h>
+ #include <linux/suspend.h>
++#ifdef CONFIG_MACH_XIAOMI_SM8150
++#include <linux/cpu_cooling.h>
++
++#ifdef CONFIG_DRM
++#include <linux/msm_drm_notify.h>
++#endif
++#endif
+ 
+ #define CREATE_TRACE_POINTS
+ #include <trace/events/thermal.h>
+@@ -38,6 +45,10 @@ MODULE_LICENSE("GPL v2");
+ 
+ #define THERMAL_MAX_ACTIVE	16
+ 
++#ifdef CONFIG_MACH_XIAOMI_SM8150
++#define CPU_LIMITS_PARAM_NUM	2
++#endif
++
+ static DEFINE_IDA(thermal_tz_ida);
+ static DEFINE_IDA(thermal_cdev_ida);
+ 
+@@ -56,6 +67,21 @@ static struct thermal_governor *def_governor;
+ 
+ static struct workqueue_struct *thermal_passive_wq;
+ 
++#ifdef CONFIG_MACH_XIAOMI_SM8150
++#ifdef CONFIG_DRM
++struct screen_monitor {
++	struct notifier_block thermal_notifier;
++	int screen_state; /* 1: on; 0:off */
++};
++
++struct screen_monitor sm;
++#endif
++
++static atomic_t switch_mode = ATOMIC_INIT(-1);
++static atomic_t temp_state = ATOMIC_INIT(0);
++static char boost_buf[128];
++#endif
++
+ /*
+  * Governor section: set of functions to handle thermal governors
+  *
+@@ -944,6 +970,10 @@ static struct class thermal_class = {
+ 	.dev_release = thermal_release,
+ };
+ 
++#ifdef CONFIG_MACH_XIAOMI_SM8150
++static struct device thermal_message_dev;
++#endif
++
+ static inline
+ void print_bind_err_msg(struct thermal_zone_device *tz,
+ 			struct thermal_cooling_device *cdev, int ret)
+@@ -1624,6 +1654,185 @@ static struct notifier_block thermal_pm_nb = {
+ 	.notifier_call = thermal_pm_notify,
+ };
+ 
++#ifdef CONFIG_MACH_XIAOMI_SM8150
++#ifdef CONFIG_DRM
++static ssize_t
++thermal_screen_state_show(struct device *dev,
++		struct device_attribute *attr, char *buf)
++{
++	return snprintf(buf, PAGE_SIZE, "%d\n", sm.screen_state);
++}
++
++static DEVICE_ATTR(screen_state, 0644,
++		thermal_screen_state_show, NULL);
++#endif
++
++static ssize_t
++thermal_sconfig_show(struct device *dev,
++				      struct device_attribute *attr, char *buf)
++{
++	return snprintf(buf, PAGE_SIZE, "%d\n", atomic_read(&switch_mode));
++}
++
++static ssize_t
++thermal_sconfig_store(struct device *dev,
++				      struct device_attribute *attr, const char *buf, size_t len)
++{
++	int val = -1;
++
++	val = simple_strtol(buf, NULL, 10);
++
++	atomic_set(&switch_mode, val);
++
++	return len;
++}
++
++static DEVICE_ATTR(sconfig, 0664,
++		   thermal_sconfig_show, thermal_sconfig_store);
++
++static ssize_t
++thermal_boost_show(struct device *dev,
++				      struct device_attribute *attr, char *buf)
++{
++	return snprintf(buf, PAGE_SIZE, boost_buf);
++}
++
++static ssize_t
++thermal_boost_store(struct device *dev,
++				      struct device_attribute *attr, const char *buf, size_t len)
++{
++	int ret;
++	ret = snprintf(boost_buf, PAGE_SIZE, buf);
++	return len;
++}
++
++static DEVICE_ATTR(boost, 0644,
++		   thermal_boost_show, thermal_boost_store);
++
++static ssize_t
++thermal_temp_state_show(struct device *dev,
++				      struct device_attribute *attr, char *buf)
++{
++	return snprintf(buf, PAGE_SIZE, "%d\n", atomic_read(&temp_state));
++}
++
++static ssize_t
++thermal_temp_state_store(struct device *dev,
++				      struct device_attribute *attr, const char *buf, size_t len)
++{
++	int val = -1;
++
++	val = simple_strtol(buf, NULL, 10);
++
++	atomic_set(&temp_state, val);
++
++	return len;
++}
++
++static DEVICE_ATTR(temp_state, 0664,
++		   thermal_temp_state_show, thermal_temp_state_store);
++
++static ssize_t
++cpu_limits_show(struct device *dev,
++				      struct device_attribute *attr, char *buf)
++{
++	return 0;
++}
++
++static ssize_t
++cpu_limits_store(struct device *dev,
++				      struct device_attribute *attr, const char *buf, size_t len)
++{
++	unsigned int cpu;
++	unsigned int max;
++
++	if (sscanf(buf, "cpu%u %u", &cpu, &max) != CPU_LIMITS_PARAM_NUM) {
++		pr_err("input param error, can not prase param\n");
++		return -EINVAL;
++	}
++
++	cpu_limits_set_level(cpu, max);
++
++	return len;
++}
++
++static DEVICE_ATTR(cpu_limits, 0664,
++		   cpu_limits_show, cpu_limits_store);
++
++static int create_thermal_message_node(void)
++{
++	int ret = 0;
++
++	thermal_message_dev.class = &thermal_class;
++
++	dev_set_name(&thermal_message_dev, "thermal_message");
++	ret = device_register(&thermal_message_dev);
++	if (!ret) {
++#ifdef CONFIG_DRM
++		ret = sysfs_create_file(&thermal_message_dev.kobj, &dev_attr_screen_state.attr);
++		if (ret < 0)
++			pr_warn("Thermal: create batt message node failed\n");
++#endif
++		ret = sysfs_create_file(&thermal_message_dev.kobj, &dev_attr_sconfig.attr);
++		if (ret < 0)
++			pr_warn("Thermal: create sconfig node failed\n");
++
++		ret = sysfs_create_file(&thermal_message_dev.kobj, &dev_attr_boost.attr);
++		if (ret < 0)
++			pr_warn("Thermal: create boost node failed\n");
++
++		ret = sysfs_create_file(&thermal_message_dev.kobj, &dev_attr_temp_state.attr);
++		if (ret < 0)
++			pr_warn("Thermal: create temp state node failed\n");
++
++		ret = sysfs_create_file(&thermal_message_dev.kobj, &dev_attr_cpu_limits.attr);
++		if (ret < 0)
++			pr_warn("Thermal: create cpu limits node failed\n");
++	}
++
++	return ret;
++}
++
++static void destroy_thermal_message_node(void)
++{
++	sysfs_remove_file(&thermal_message_dev.kobj, &dev_attr_cpu_limits.attr);
++	sysfs_remove_file(&thermal_message_dev.kobj, &dev_attr_temp_state.attr);
++	sysfs_remove_file(&thermal_message_dev.kobj, &dev_attr_boost.attr);
++	sysfs_remove_file(&thermal_message_dev.kobj, &dev_attr_sconfig.attr);
++#ifdef CONFIG_DRM
++	sysfs_remove_file(&thermal_message_dev.kobj, &dev_attr_screen_state.attr);
++#endif
++	device_unregister(&thermal_message_dev);
++}
++
++#ifdef CONFIG_DRM
++static int screen_state_for_thermal_callback(struct notifier_block *nb, unsigned long val, void *data)
++{
++	struct msm_drm_notifier *evdata = data;
++	unsigned int blank;
++
++	if (val != MSM_DRM_EVENT_BLANK || !evdata || !evdata->data)
++		return 0;
++
++	blank = *(int *)(evdata->data);
++	switch (blank) {
++	case MSM_DRM_BLANK_POWERDOWN:
++		sm.screen_state = 0;
++		break;
++	case MSM_DRM_BLANK_UNBLANK:
++		sm.screen_state = 1;
++		break;
++	default:
++		break;
++	}
++
++	sysfs_notify(&thermal_message_dev.kobj, NULL, "screen_state");
++
++	return NOTIFY_OK;
++}
++#endif
++#endif
++
+ static int __init thermal_init(void)
+ {
+ 	int result;
+@@ -1655,6 +1864,20 @@ static int __init thermal_init(void)
+ 		pr_warn("Thermal: Can not register suspend notifier, return %d\n",
+ 			result);
+ 
++#ifdef CONFIG_MACH_XIAOMI_SM8150
++	result = create_thermal_message_node();
++	if (result)
++		pr_warn("Thermal: create thermal message node failed, return %d\n",
++			result);
++
++#ifdef CONFIG_DRM
++	sm.thermal_notifier.notifier_call = screen_state_for_thermal_callback;
++	if (msm_drm_register_client(&sm.thermal_notifier) < 0) {
++		pr_warn("Thermal: register screen state callback failed\n");
++	}
++#endif
++#endif
++
+ 	return 0;
+ 
+ exit_zone_parse:
+@@ -1674,6 +1897,12 @@ static int __init thermal_init(void)
+ 
+ static void thermal_exit(void)
+ {
++#ifdef CONFIG_MACH_XIAOMI_SM8150
++#ifdef CONFIG_DRM
++	msm_drm_unregister_client(&sm.thermal_notifier);
++#endif
++	destroy_thermal_message_node();
++#endif
+ 	unregister_pm_notifier(&thermal_pm_nb);
+ 	of_thermal_destroy_zones();
+ 	destroy_workqueue(thermal_passive_wq);
+diff --git a/include/linux/cpu_cooling.h b/include/linux/cpu_cooling.h
+index f85fa59e6..8ed9c87e8 100644
+--- a/include/linux/cpu_cooling.h
++++ b/include/linux/cpu_cooling.h
+@@ -54,6 +54,10 @@ struct thermal_cooling_device *
+ cpufreq_platform_cooling_register(const struct cpumask *clip_cpus,
+ 					struct cpu_cooling_ops *ops);
+ 
++#ifdef CONFIG_MACH_XIAOMI_SM8150
++void cpu_limits_set_level(unsigned int cpu, unsigned int max_freq);
++#endif
++
+ /**
+  * of_cpufreq_cooling_register - create cpufreq cooling device based on DT.
+  * @np: a valid struct device_node to the cooling device device tree node.
+-- 
+2.52.0
+

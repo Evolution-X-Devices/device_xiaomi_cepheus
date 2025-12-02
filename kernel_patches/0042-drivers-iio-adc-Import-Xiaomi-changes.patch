@@ -1,0 +1,35 @@
+From 862aa174f8cd9da0e5179708be597291029793cf Mon Sep 17 00:00:00 2001
+From: Sebastiano Barezzi <barezzisebastiano@gmail.com>
+Date: Wed, 22 Jun 2022 17:57:23 +0200
+Subject: [PATCH 042/115] drivers: iio: adc: Import Xiaomi changes
+
+Change-Id: I0a5ef10d57b86f21b4acbf7255826bdbed629cc0
+---
+ drivers/iio/adc/qcom-spmi-adc5.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/drivers/iio/adc/qcom-spmi-adc5.c b/drivers/iio/adc/qcom-spmi-adc5.c
+index 4ba747ce1..36861c2b1 100644
+--- a/drivers/iio/adc/qcom-spmi-adc5.c
++++ b/drivers/iio/adc/qcom-spmi-adc5.c
+@@ -763,10 +763,17 @@ static const struct adc_channels adc_chans_pmic5[ADC_MAX_CHANNEL] = {
+ 					SCALE_HW_CALIB_PM5_SMB_TEMP)
+ 	[ADC_AMUX_THM3]			= ADC_CHAN_TEMP("amux_thm3", 1,
+ 					SCALE_HW_CALIB_PM5_SMB_TEMP)
++#ifdef CONFIG_MACH_XIAOMI_SM8150
++	[ADC_GPIO1_PU2]	= ADC_CHAN_VOLT("gpio1_pu2", 1,
++					SCALE_HW_CALIB_DEFAULT)
++	[ADC_GPIO2_PU2]	= ADC_CHAN_VOLT("gpio2_pu2", 1,
++					SCALE_HW_CALIB_DEFAULT)
++#else
+ 	[ADC_GPIO1_PU2]	= ADC_CHAN_TEMP("gpio1_pu2", 1,
+ 					SCALE_HW_CALIB_THERM_100K_PULLUP)
+ 	[ADC_GPIO2_PU2]	= ADC_CHAN_TEMP("gpio2_pu2", 1,
+ 					SCALE_HW_CALIB_THERM_100K_PULLUP)
++#endif
+ 	[ADC_GPIO3_PU2]	= ADC_CHAN_TEMP("gpio3_pu2", 1,
+ 					SCALE_HW_CALIB_THERM_100K_PULLUP)
+ 	[ADC_GPIO4_PU2]	= ADC_CHAN_TEMP("gpio4_pu2", 1,
+-- 
+2.52.0
+

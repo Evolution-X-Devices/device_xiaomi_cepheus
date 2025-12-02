@@ -94,30 +94,21 @@ $(call soong_config_set,libinit,vendor_init_lib,//$(DEVICE_PATH):libinit_cepheus
 TARGET_RECOVERY_DEVICE_MODULES := libinit_cepheus
 
 # Kernel
+BOARD_BOOT_HEADER_VERSION := 2
 BOARD_KERNEL_BASE := 0x00000000
-BOARD_KERNEL_IMAGE_NAME := Image-dtb
 BOARD_KERNEL_PAGESIZE := 4096
-BOARD_KERNEL_SEPARATED_DTBO := true
-BOARD_KERNEL_TAGS_OFFSET := 0x00000100
-BOARD_RAMDISK_OFFSET := 0x01000000
-
-TARGET_KERNEL_CLANG_COMPILE := true
-TARGET_KERNEL_CONFIG := cepheus_defconfig
-TARGET_KERNEL_SOURCE := kernel/xiaomi/cepheus
-TARGET_KERNEL_CLANG_VERSION := r536225
-KERNEL_TOOLCHAIN := $(shell pwd)/prebuilts/clang/host/linux-x86/clang-r536225/bin
-KERNEL_SUPPORTS_LLD := true
-KERNEL_SUPPORTS_LLVM_TOOLS := true
-
-BOARD_KERNEL_CMDLINE := console=ttyMSM0,115200n8 earlycon=msm_geni_serial,0xa90000
-BOARD_KERNEL_CMDLINE += androidboot.hardware=qcom androidboot.console=ttyMSM0
-BOARD_KERNEL_CMDLINE += androidboot.usbcontroller=a600000.dwc3
-#BOARD_KERNEL_CMDLINE += androidboot.selinux=permissive
-BOARD_KERNEL_CMDLINE += service_locator.enable=1
-BOARD_KERNEL_CMDLINE += loop.max_part=7
+BOARD_KERNEL_CMDLINE := androidboot.hardware=qcom androidboot.console=ttyMSM0 androidboot.memcg=1 lpm_levels.sleep_disabled=1 msm_rtb.filter=0x237 service_locator.enable=1 swiotlb=2048 loop.max_part=7 androidboot.usbcontroller=a600000.dwc3
+BOARD_KERNEL_CMDLINE += androidboot.fstab_suffix=qcom
 BOARD_KERNEL_CMDLINE += androidboot.init_fatal_reboot_target=recovery
-BOARD_KERNEL_CMDLINE += kpti=off
-BOARD_KERNEL_CMDLINE += androidboot.boot_devices=soc/1d84000.ufshc
+BOARD_KERNEL_IMAGE_NAME := Image.gz
+BOARD_INCLUDE_DTB_IN_BOOTIMG := true
+BOARD_KERNEL_SEPARATED_DTBO := true
+BOARD_MKBOOTIMG_ARGS += --header_version $(BOARD_BOOT_HEADER_VERSION)
+TARGET_KERNEL_SOURCE := kernel/xiaomi/sm8150
+TARGET_KERNEL_CONFIG := \
+    vendor/sm8150-perf_defconfig \
+    vendor/xiaomi/sm8150-common.config \
+    vendor/xiaomi/cepheus.config
 
 # Lineage Health
 $(call soong_config_set_bool,lineage_health,charging_control_supports_bypass,false)

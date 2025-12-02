@@ -1,0 +1,50 @@
+From 2034bea4f1d277d19b909e13f1b7e404bb58e15a Mon Sep 17 00:00:00 2001
+From: Sebastiano Barezzi <seba@sebaubuntu.dev>
+Date: Mon, 6 Nov 2023 00:58:45 +0100
+Subject: [PATCH 012/115] drivers: char: Import Xiaomi changes
+
+Change-Id: I25159512098a4af867382e81d03f46b509e3763e
+---
+ drivers/char/adsprpc.c | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
+
+diff --git a/drivers/char/adsprpc.c b/drivers/char/adsprpc.c
+index c2192986a..e219aff65 100644
+--- a/drivers/char/adsprpc.c
++++ b/drivers/char/adsprpc.c
+@@ -4613,15 +4613,32 @@ static int fastrpc_probe(struct platform_device *pdev)
+ 		if (range.addr && !of_property_read_bool(dev->of_node,
+ 							 "restrict-access")) {
+ 			int srcVM[1] = {VMID_HLOS};
++#ifdef CONFIG_MACH_XIAOMI_SM8150
++			int destVM[4] = {VMID_HLOS, VMID_MSS_MSA, VMID_SSC_Q6,
++						VMID_ADSP_Q6};
++#else
+ 			int destVM[3] = {VMID_HLOS, VMID_SSC_Q6,
+ 						VMID_ADSP_Q6};
++#endif
++#ifdef CONFIG_MACH_XIAOMI_SM8150
++			int destVMperm[4] = {PERM_READ | PERM_WRITE | PERM_EXEC,
++#else
+ 			int destVMperm[3] = {PERM_READ | PERM_WRITE | PERM_EXEC,
++#endif
++#ifdef CONFIG_MACH_XIAOMI_SM8150
++				PERM_READ | PERM_WRITE | PERM_EXEC,
++#endif
+ 				PERM_READ | PERM_WRITE | PERM_EXEC,
+ 				PERM_READ | PERM_WRITE | PERM_EXEC,
+ 				};
+ 
++#ifdef CONFIG_MACH_XIAOMI_SM8150
++			VERIFY(err, !hyp_assign_phys(range.addr, range.size,
++					srcVM, 1, destVM, destVMperm, 4));
++#else
+ 			VERIFY(err, !hyp_assign_phys(range.addr, range.size,
+ 					srcVM, 1, destVM, destVMperm, 3));
++#endif
+ 			if (err)
+ 				goto bail;
+ 			me->range.addr = range.addr;
+-- 
+2.52.0
+

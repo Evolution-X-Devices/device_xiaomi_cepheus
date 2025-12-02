@@ -1,0 +1,288 @@
+From 6af3d5fef08573170ebb1cc5af6ac9cdfd86986f Mon Sep 17 00:00:00 2001
+From: Sebastiano Barezzi <seba@sebaubuntu.dev>
+Date: Wed, 11 Oct 2023 15:30:25 +0200
+Subject: [PATCH 059/115] drivers: input: touchscreen: xiaomi: Make it compile
+ without xiaomi_touch
+
+Change-Id: I05c378d3bf348bfcc96e44fbca96e14cd7f3b677
+---
+ .../input/touchscreen/xiaomi/fts_521/fts.c    |  48 +++----
+ .../input/touchscreen/xiaomi/fts_521/fts.h    |   2 +-
+ .../goodix_driver_gt9886/goodix_ts_core.c     |   2 +
+ .../touchscreen/xiaomi/nt36523/nt36xxx.c      | 118 +++++++++---------
+ 4 files changed, 90 insertions(+), 80 deletions(-)
+
+diff --git a/drivers/input/touchscreen/xiaomi/fts_521/fts.c b/drivers/input/touchscreen/xiaomi/fts_521/fts.c
+index d5fa0b5ec..c1d3da688 100644
+--- a/drivers/input/touchscreen/xiaomi/fts_521/fts.c
++++ b/drivers/input/touchscreen/xiaomi/fts_521/fts.c
+@@ -68,7 +68,9 @@
+ #ifdef KERNEL_ABOVE_2_6_38
+ #include <linux/input/mt.h>
+ #endif
++#ifdef CONFIG_TOUCHSCREEN_XIAOMI_TOUCHFEATURE
+ #include "../xiaomi/xiaomi_touch.h"
++#endif
+ #include "fts.h"
+ #include "fts_lib/ftsCompensation.h"
+ #include "fts_lib/ftsCore.h"
+@@ -5000,6 +5002,29 @@ static int fts_mode_handler(struct fts_ts_info *info, int force)
+ 	return res;
+ }
+ 
++int fts_palm_sensor_cmd(int on)
++{
++	int ret;
++	u8 cmd_on[] = { 0xc0, 0x07, 0x01 };
++	u8 cmd_off[] = { 0xc0, 0x07, 0x00 };
++
++	if (on) {
++		ret = fts_write_dma_safe(cmd_on, sizeof(cmd_on));
++	} else {
++		ret = fts_write_dma_safe(cmd_off, sizeof(cmd_off));
++	}
++
++	if (ret < OK) {
++		logError(1,
++			 "%s %s: write anti mis-touch cmd on...ERROR %08X !\n",
++			 tag, __func__, ret);
++		return -EINVAL;
++	}
++	logError(1, "%s %s %d\n", tag, __func__, on);
++
++	return 0;
++}
++
+ #ifdef CONFIG_TOUCHSCREEN_XIAOMI_TOUCHFEATURE
+ static struct xiaomi_touch_interface xiaomi_touch_interfaces;
+ 
+@@ -5648,29 +5673,6 @@ int fts_p_sensor_write(int value)
+ 	return ret;
+ }
+ 
+-int fts_palm_sensor_cmd(int on)
+-{
+-	int ret;
+-	u8 cmd_on[] = { 0xc0, 0x07, 0x01 };
+-	u8 cmd_off[] = { 0xc0, 0x07, 0x00 };
+-
+-	if (on) {
+-		ret = fts_write_dma_safe(cmd_on, sizeof(cmd_on));
+-	} else {
+-		ret = fts_write_dma_safe(cmd_off, sizeof(cmd_off));
+-	}
+-
+-	if (ret < OK) {
+-		logError(1,
+-			 "%s %s: write anti mis-touch cmd on...ERROR %08X !\n",
+-			 tag, __func__, ret);
+-		return -EINVAL;
+-	}
+-	logError(1, "%s %s %d\n", tag, __func__, on);
+-
+-	return 0;
+-}
+-
+ int fts_palm_sensor_write(int value)
+ {
+ 	int ret = 0;
+diff --git a/drivers/input/touchscreen/xiaomi/fts_521/fts.h b/drivers/input/touchscreen/xiaomi/fts_521/fts.h
+index 0e5522d2e..118d750d3 100644
+--- a/drivers/input/touchscreen/xiaomi/fts_521/fts.h
++++ b/drivers/input/touchscreen/xiaomi/fts_521/fts.h
+@@ -388,9 +388,9 @@ bool fts_is_infod(void);
+ void fts_get_pointer(int *touch_flag, int *x, int *y);
+ #endif
+ void fts_restore_regvalues(void);
++int fts_palm_sensor_cmd(int input);
+ 
+ #ifdef CONFIG_TOUCHSCREEN_XIAOMI_TOUCHFEATURE
+-int fts_palm_sensor_cmd(int input);
+ int fts_p_sensor_cmd(int input);
+ bool fts_touchmode_edgefilter(unsigned int touch_id, int x, int y);
+ #endif
+diff --git a/drivers/input/touchscreen/xiaomi/goodix_driver_gt9886/goodix_ts_core.c b/drivers/input/touchscreen/xiaomi/goodix_driver_gt9886/goodix_ts_core.c
+index 3ba99ad25..fa59135c8 100644
+--- a/drivers/input/touchscreen/xiaomi/goodix_driver_gt9886/goodix_ts_core.c
++++ b/drivers/input/touchscreen/xiaomi/goodix_driver_gt9886/goodix_ts_core.c
+@@ -42,7 +42,9 @@
+ #define INPUT_TYPE_B_PROTOCOL
+ #endif
+ #include <linux/backlight.h>
++#ifdef CONFIG_TOUCHSCREEN_XIAOMI_TOUCHFEATURE
+ #include "../xiaomi/xiaomi_touch.h"
++#endif
+ #include "test_core/test_param_init.h"
+ 
+ #define INPUT_EVENT_START 0
+diff --git a/drivers/input/touchscreen/xiaomi/nt36523/nt36xxx.c b/drivers/input/touchscreen/xiaomi/nt36523/nt36xxx.c
+index 914e1598d..707cacb27 100644
+--- a/drivers/input/touchscreen/xiaomi/nt36523/nt36xxx.c
++++ b/drivers/input/touchscreen/xiaomi/nt36523/nt36xxx.c
+@@ -2013,6 +2013,62 @@ static void nvt_switch_mode_work(struct work_struct *work)
+ 	}
+ }
+ 
++static int disable_pen_input_device(bool disable)
++{
++	uint8_t buf[8] = { 0 };
++	int32_t ret = 0;
++
++	NVT_LOG("++\n");
++	if (!bTouchIsAwake || !ts) {
++		NVT_LOG("touch suspend, stop set pen state %s",
++			disable ? "DISABLE" : "ENABLE");
++		goto nvt_set_pen_enable_out;
++	}
++
++	msleep(35);
++	disable = (!(ts->pen_input_dev_enable) || ts->pen_is_charge) ? true :
++								       disable;
++
++	//---set xdata index to EVENT BUF ADDR---
++	ret = nvt_set_page(ts->mmap->EVENT_BUF_ADDR | EVENT_MAP_HOST_CMD);
++	if (ret < 0) {
++		NVT_ERR("Set event buffer index fail!\n");
++		goto nvt_set_pen_enable_out;
++	}
++
++	buf[0] = EVENT_MAP_HOST_CMD;
++	buf[1] = 0x7B;
++	buf[2] = !!disable;
++	ret = CTP_SPI_WRITE(ts->client, buf, 3);
++	if (ret < 0) {
++		NVT_ERR("set pen %s failed!\n", disable ? "DISABLE" : "ENABLE");
++		goto nvt_set_pen_enable_out;
++	}
++	NVT_LOG("pen charge state is %s, %s pen input device\n",
++		ts->pen_is_charge ? "ENABLE" : "DISABLE",
++		disable ? "DISABLE" : "ENABLE");
++
++nvt_set_pen_enable_out:
++	NVT_LOG("--\n");
++	return ret;
++}
++
++static int nvt_pen_charge_state_notifier_callback(struct notifier_block *self,
++						  unsigned long event,
++						  void *data)
++{
++	ts->pen_is_charge = !!event;
++	release_pen_event();
++	schedule_work(&ts->pen_charge_state_change_work);
++	return 0;
++}
++
++static void nvt_pen_charge_state_change_work(struct work_struct *work)
++{
++	NVT_LOG("pen charge is %s", ts->pen_is_charge ? "ENABLE" : "DISABLE");
++	disable_pen_input_device(ts->pen_is_charge);
++}
++
+ #ifdef CONFIG_TOUCHSCREEN_XIAOMI_TOUCHFEATURE
+ static struct xiaomi_touch_interface xiaomi_touch_interfaces;
+ 
+@@ -2323,62 +2379,6 @@ static void update_touchfeature_value_work(struct work_struct *work)
+ 	NVT_LOG("exit");
+ }
+ 
+-static int disable_pen_input_device(bool disable)
+-{
+-	uint8_t buf[8] = { 0 };
+-	int32_t ret = 0;
+-
+-	NVT_LOG("++\n");
+-	if (!bTouchIsAwake || !ts) {
+-		NVT_LOG("touch suspend, stop set pen state %s",
+-			disable ? "DISABLE" : "ENABLE");
+-		goto nvt_set_pen_enable_out;
+-	}
+-
+-	msleep(35);
+-	disable = (!(ts->pen_input_dev_enable) || ts->pen_is_charge) ? true :
+-								       disable;
+-
+-	//---set xdata index to EVENT BUF ADDR---
+-	ret = nvt_set_page(ts->mmap->EVENT_BUF_ADDR | EVENT_MAP_HOST_CMD);
+-	if (ret < 0) {
+-		NVT_ERR("Set event buffer index fail!\n");
+-		goto nvt_set_pen_enable_out;
+-	}
+-
+-	buf[0] = EVENT_MAP_HOST_CMD;
+-	buf[1] = 0x7B;
+-	buf[2] = !!disable;
+-	ret = CTP_SPI_WRITE(ts->client, buf, 3);
+-	if (ret < 0) {
+-		NVT_ERR("set pen %s failed!\n", disable ? "DISABLE" : "ENABLE");
+-		goto nvt_set_pen_enable_out;
+-	}
+-	NVT_LOG("pen charge state is %s, %s pen input device\n",
+-		ts->pen_is_charge ? "ENABLE" : "DISABLE",
+-		disable ? "DISABLE" : "ENABLE");
+-
+-nvt_set_pen_enable_out:
+-	NVT_LOG("--\n");
+-	return ret;
+-}
+-
+-static int nvt_pen_charge_state_notifier_callback(struct notifier_block *self,
+-						  unsigned long event,
+-						  void *data)
+-{
+-	ts->pen_is_charge = !!event;
+-	release_pen_event();
+-	schedule_work(&ts->pen_charge_state_change_work);
+-	return 0;
+-}
+-
+-static void nvt_pen_charge_state_change_work(struct work_struct *work)
+-{
+-	NVT_LOG("pen charge is %s", ts->pen_is_charge ? "ENABLE" : "DISABLE");
+-	disable_pen_input_device(ts->pen_is_charge);
+-}
+-
+ static int nvt_set_cur_value(int nvt_mode, int nvt_value)
+ {
+ 	if (nvt_mode >= Touch_Mode_NUM && nvt_mode < 0) {
+@@ -3231,6 +3231,7 @@ static int32_t nvt_ts_probe(struct spi_device *client)
+ 	}
+ 	INIT_WORK(&ts->resume_work, nvt_resume_work);
+ 	INIT_WORK(&ts->suspend_work, nvt_suspend_work);
++#ifdef CONFIG_TOUCHSCREEN_XIAOMI_TOUCHFEATURE
+ 	ts->set_touchfeature_wq =
+ 		create_singlethread_workqueue("nvt-set-touchfeature-queue");
+ 	if (!ts->set_touchfeature_wq) {
+@@ -3239,6 +3240,7 @@ static int32_t nvt_ts_probe(struct spi_device *client)
+ 		goto err_create_set_touchfeature_work_queue;
+ 	}
+ 	INIT_WORK(&ts->set_touchfeature_work, update_touchfeature_value_work);
++#endif
+ 
+ 	ts->pen_charge_state_notifier.notifier_call =
+ 		nvt_pen_charge_state_notifier_callback;
+@@ -3321,8 +3323,10 @@ static int32_t nvt_ts_probe(struct spi_device *client)
+ 		    &ts->pen_charge_state_notifier))
+ 		NVT_ERR("Error occurred while unregistering pen charge state notifier.\n");
+ err_register_pen_charge_state_failed:
++#ifdef CONFIG_TOUCHSCREEN_XIAOMI_TOUCHFEATURE
+ 	destroy_workqueue(ts->set_touchfeature_wq);
+ err_create_set_touchfeature_work_queue:
++#endif
+ 	destroy_workqueue(ts->event_wq);
+ err_alloc_work_thread_failed:
+ #ifndef NVT_SAVE_TESTDATA_IN_FILE
+@@ -3490,8 +3494,10 @@ static int32_t nvt_ts_remove(struct spi_device *client)
+ 
+ 	spi_set_drvdata(client, NULL);
+ 
++#ifdef CONFIG_TOUCHSCREEN_XIAOMI_TOUCHFEATURE
+ 	if (ts->set_touchfeature_wq)
+ 		destroy_workqueue(ts->set_touchfeature_wq);
++#endif
+ 
+ 	if (ts) {
+ 		kfree(ts);
+-- 
+2.52.0
+

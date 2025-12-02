@@ -1,0 +1,32 @@
+From 500bb2e70595044969e9a2796ba2196fb0b11e8e Mon Sep 17 00:00:00 2001
+From: Sebastiano Barezzi <barezzisebastiano@gmail.com>
+Date: Wed, 22 Jun 2022 19:36:43 +0200
+Subject: [PATCH 089/115] drivers: sensors: Import Xiaomi changes
+
+Change-Id: I22bcac45b0f804931f9bf32a89e2fbd2e010f9c0
+---
+ drivers/sensors/sensors_ssc.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/drivers/sensors/sensors_ssc.c b/drivers/sensors/sensors_ssc.c
+index dfdbd8e8d..619b0bbdb 100644
+--- a/drivers/sensors/sensors_ssc.c
++++ b/drivers/sensors/sensors_ssc.c
+@@ -123,6 +123,14 @@ static void slpi_load_fw(struct work_struct *slpi_ldr_work)
+ 
+ fail:
+ 	dev_err(&pdev->dev, "%s: SLPI image loading failed\n", __func__);
++#ifdef CONFIG_MACH_XIAOMI_SM8150
++	priv->pil_h = subsystem_get_with_fwname("slpi", "slpi");
++	if (IS_ERR(priv->pil_h)) {
++		dev_err(&pdev->dev, "%s: SLPI image re-loading failed\n", __func__);
++	} else {
++		dev_info(&pdev->dev, "%s: SLPI image is loaded\n", __func__);
++	}
++#endif
+ }
+ 
+ static void slpi_loader_do(struct platform_device *pdev)
+-- 
+2.52.0
+
