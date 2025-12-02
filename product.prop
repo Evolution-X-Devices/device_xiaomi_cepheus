@@ -30,6 +30,9 @@ debug.sf.early.app.duration=16500000
 debug.sf.earlyGl.sf.duration=13500000
 debug.sf.earlyGl.app.duration=21000000
 
+# eBPF
+ro.bpf.kver_override=5.4.299
+
 # IMS
 ro.telephony.block_binder_thread_on_incoming_calls=false
 
