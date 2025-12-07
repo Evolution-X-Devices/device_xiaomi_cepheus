@@ -46,8 +46,7 @@
 /dev/elliptic(.*)?                                                                                     u:object_r:sound_device:s0
 
 # Touch Panel
-/proc/touchpanel/wake_gesture                                                                          u:object_r:sysfs_touchpanel:s0
-/sys/devices/platform/soc/c80000.i2c/i2c-2/2-0049/input/input4/wake_gesture                            u:object_r:sysfs_touchpanel:s0
+/sys/touchpanel/double_tap                                                                             u:object_r:sysfs_touchpanel:s0
 
 # UFS
 /sys/devices/platform/soc/[a-f0-9]+.ufshc/clkgate_enable                                               u:object_r:vendor_sysfs_scsi_host:s0
