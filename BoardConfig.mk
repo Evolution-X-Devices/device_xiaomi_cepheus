@@ -101,7 +101,7 @@ BOARD_KERNEL_SEPARATED_DTBO := true
 BOARD_KERNEL_TAGS_OFFSET := 0x00000100
 BOARD_RAMDISK_OFFSET := 0x01000000
 
-TARGET_KERNEL_SOURCE := kernel/xiaomi/sm8150
+TARGET_KERNEL_SOURCE := kernel/xiaomi/cepheus
 TARGET_KERNEL_CONFIG := \
     vendor/sm8150-perf_defconfig \
     vendor/xiaomi/sm8150-common.config \
