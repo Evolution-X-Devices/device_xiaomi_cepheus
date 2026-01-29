@@ -5,7 +5,7 @@ allow init adsprpcd_file:file mounton;
 # to support tracefs if debugfs is disabled
 allow init debugfs_tracing_debug:dir mounton;
 
-set_prop(vendor_init, vendor_power_prop)
+set_prop(init, vendor_fp_prop)
 
 # Allow init to read and write to vendor_sysfs_graphics
 allow init vendor_sysfs_graphics:dir search;
