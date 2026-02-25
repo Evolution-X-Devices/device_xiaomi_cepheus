@@ -127,7 +127,7 @@ PRODUCT_COPY_FILES += \
     frameworks/native/data/etc/android.hardware.camera.raw.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.camera.raw.xml
 
 # MiuiCamera
-TARGET_CAMERA_PACKAGE_NAME := com.android.camera
+$(call soong_config_set,camera,package_name,com.android.camera)
 $(call soong_config_set_bool,camera,override_format_from_reserved,true)
 TARGET_USES_MIUI_CAMERA := true
 $(call inherit-product-if-exists, vendor/xiaomi/miuicamera-cepheus/config.mk)
