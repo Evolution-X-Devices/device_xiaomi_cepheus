@@ -439,7 +439,7 @@ PRODUCT_PACKAGES += \
     libprotobuf-cpp-full-vendorcompat
 
 # RRO overlays
-PRODUCT_PACKAGES +=
+PRODUCT_PACKAGES += \
     ApertureOverlay \
     CarrierConfigOverlay \
     FrameworksResOverlay \
