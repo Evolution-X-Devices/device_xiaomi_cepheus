@@ -23,11 +23,11 @@ cc_prebuilt_library_shared {
 }
 
 cc_prebuilt_library_shared {
-        name: "libc29",
-        vendor_available: true,
-        strip: {
-                none: true,
-        },
-        srcs: ["libc++.so"],
-        check_elf_files: false,
+    name: "libc29",
+    vendor_available: true,
+    strip: {
+        none: true,
+    },
+    srcs: ["libc++.so"],
+    check_elf_files: false,
 }

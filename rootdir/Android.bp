@@ -1,0 +1,25 @@
+//
+// Copyright (C) The LineageOS Project
+//
+// SPDX-License-Identifier: Apache-2.0
+//
+
+sh_binary {
+    name: "wifi-mac-generator.sh",
+    src: "bin/wifi-mac-generator.sh",
+    vendor: true,
+}
+
+prebuilt_etc {
+    name: "wifi-mac-generator.rc",
+    src: "etc/wifi-mac-generator.rc",
+    sub_dir: "init/hw",
+    vendor: true,
+}
+
+prebuilt_etc {
+    name: "init.power.rc",
+    src: "etc/init.power.rc",
+    sub_dir: "init/hw",
+    vendor: true,
+}

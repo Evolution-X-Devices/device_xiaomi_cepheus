@@ -243,7 +243,9 @@ PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/rootdir/bin/init.qcom.sh:$(TARGET_COPY_OUT_VENDOR)/bin/init.qcom.sh
 
 PRODUCT_PACKAGES += \
-    init.power.rc
+    init.power.rc \
+    wifi-mac-generator.sh \
+    wifi-mac-generator.rc
 
 # Input
 PRODUCT_COPY_FILES += \
@@ -602,10 +604,6 @@ PRODUCT_COPY_FILES += \
 # Override heap growth limit due to high display density on device
 PRODUCT_PROPERTY_OVERRIDES += \
     dalvik.vm.heapgrowthlimit=256m
-
-# Mac Address Generator
-PRODUCT_PACKAGES += \
-    wifi-mac-generator
 
 # WiFi firmware symlinks
 PRODUCT_PACKAGES += \
