@@ -17,5 +17,5 @@
 runtime_resource_overlay {
     name: "SmoothCutoutOverlay",
     sdk_version: "current",
-    vendor: true,
+    product_specific: true
 }

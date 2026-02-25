@@ -375,17 +375,6 @@ PRODUCT_COPY_FILES += \
     frameworks/native/data/etc/com.android.nfc_extras.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/com.android.nfc_extras.xml \
     frameworks/native/data/etc/com.nxp.mifare.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/com.nxp.mifare.xml
 
-# Overlays
-DEVICE_PACKAGE_OVERLAYS += \
-    $(LOCAL_PATH)/overlay \
-    $(LOCAL_PATH)/overlay-evolution
-    
-PRODUCT_ENFORCE_RRO_EXCLUDED_OVERLAYS += \
-    $(LOCAL_PATH)/overlay/frameworks/base/packages/overlays/NoCutoutOverlay
-
-PRODUCT_PACKAGES += \
-    NoCutoutOverlay
-
 # Parts
 PRODUCT_PACKAGES += \
     XiaomiDolby
@@ -437,7 +426,6 @@ PRODUCT_PACKAGES += \
     android.hardware.radio@1.5.vendor \
     android.hardware.radio.config@1.2.vendor \
     android.hardware.radio.deprecated@1.0.vendor \
-    CarrierConfigOverlay \
     libcurl.vendor \
     libjson \
     libjsoncpp.vendor \
@@ -449,6 +437,19 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
     libprotobuf-cpp-lite-vendorcompat \
     libprotobuf-cpp-full-vendorcompat
+
+# RRO overlays
+PRODUCT_PACKAGES +=
+    ApertureOverlay \
+    CarrierConfigOverlay \
+    FrameworksResOverlay \
+    SettingsOverlay \
+    SettingsProviderOverlay \
+    SmoothCutoutOverlay \
+    SystemUIOverlay \
+    TelephonyOverlay \
+    TetheringOverlay \
+    WifiOverlay
 
 # Screen density
 PRODUCT_AAPT_CONFIG := normal
@@ -477,10 +478,6 @@ PRODUCT_COPY_FILES += \
     frameworks/native/data/etc/android.hardware.sensor.proximity.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.sensor.proximity.xml \
     frameworks/native/data/etc/android.hardware.sensor.stepcounter.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.sensor.stepcounter.xml \
     frameworks/native/data/etc/android.hardware.sensor.stepdetector.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.sensor.stepdetector.xml
-
-# Smoothen cutout
-PRODUCT_PACKAGES += \
-    SmoothCutoutOverlay
 
 # Shims
 PRODUCT_PACKAGES += \
@@ -584,8 +581,6 @@ PRODUCT_PACKAGES += \
     libwifi-hal-ctrl \
     libwifi-hal-qcom \
     libwpa_client \
-    TetheringConfigOverlay \
-    WifiOverlay \
     wpa_cli \
     wpa_supplicant \
     wpa_supplicant.conf
