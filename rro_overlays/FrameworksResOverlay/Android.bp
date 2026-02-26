@@ -4,7 +4,7 @@
 //
 
 runtime_resource_overlay {
-    name: "FrameworkResOverlay",
+    name: "FrameworksResOverlay",
     sdk_version: "current",
     product_specific: true
 }
