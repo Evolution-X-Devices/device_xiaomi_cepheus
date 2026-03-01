@@ -130,7 +130,7 @@ PRODUCT_COPY_FILES += \
 $(call soong_config_set,camera,package_name,com.android.camera)
 $(call soong_config_set_bool,camera,override_format_from_reserved,true)
 TARGET_USES_MIUI_CAMERA := true
-$(call inherit-product-if-exists, vendor/xiaomi/miuicamera-cepheus/config.mk)
+$(call inherit-product-if-exists, vendor/xiaomi/miuicamera/config.mk)
 
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/configs/permissions/privapp-permissions-miuicamera.xml:$(TARGET_COPY_OUT_SYSTEM)/etc/permissions/privapp-permissions-miuicamera.xml
@@ -235,6 +235,7 @@ PRODUCT_PACKAGES += \
 # Init scripts
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/rootdir/etc/init.qcom.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/hw/init.qcom.rc \
+    $(LOCAL_PATH)/rootdir/etc/init.xiaomi.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/hw/init.xiaomi.rc \
     $(LOCAL_PATH)/rootdir/etc/init.qcom.usb.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/hw/init.qcom.usb.rc \
     $(LOCAL_PATH)/rootdir/etc/init.recovery.qcom.rc:$(TARGET_COPY_OUT_RECOVERY)/root/init.recovery.qcom.rc \
     $(LOCAL_PATH)/rootdir/etc/init.target.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/hw/init.target.rc
@@ -245,6 +246,7 @@ PRODUCT_COPY_FILES += \
 PRODUCT_PACKAGES += \
     init.power.rc \
     wifi-mac-generator.sh \
+    init.xiaomi.rc \
     wifi-mac-generator.rc
 
 # Input
@@ -441,6 +443,7 @@ PRODUCT_PACKAGES += \
 # RRO overlays
 PRODUCT_PACKAGES += \
     ApertureOverlay \
+    LineageSDKOverlayDevice \
     CarrierConfigOverlay \
     FrameworksResOverlay \
     SettingsOverlay \

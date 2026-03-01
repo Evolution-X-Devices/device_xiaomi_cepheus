@@ -21,17 +21,18 @@ $(call inherit-product, $(SRC_TARGET_DIR)/product/full_base_telephony.mk)
 # Inherit from cepheus device
 $(call inherit-product, device/xiaomi/cepheus/device.mk)
 
-# Inherit some common EvolutionX stuff.
-$(call inherit-product, vendor/lineage/config/common_full_phone.mk)
+# Inherit some common stuff.
+$(call inherit-product, vendor/infinity/config/common_full_phone.mk)
 
 BUILD_SEEDVAULT := true
 TARGET_BOOT_ANIMATION_RES := 1080
 TARGET_HAS_UDFPS := true
 TARGET_INCLUDE_ACCORD = false
-TARGET_USES_MINI_GAPPS := true
+INFINITY_MAINTAINER := ilert0104
+WITH_GAPPS := true
 
 # Device identifier
-PRODUCT_NAME := lineage_cepheus
+PRODUCT_NAME := infinity_cepheus
 PRODUCT_DEVICE := cepheus
 PRODUCT_BRAND := Xiaomi
 PRODUCT_MODEL := Mi 9

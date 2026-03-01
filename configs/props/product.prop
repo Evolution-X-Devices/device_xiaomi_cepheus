@@ -93,3 +93,10 @@ wifi.interface=wlan0
 
 # Zygote
 persist.device_config.runtime_native.usap_pool_enabled=true
+
+# InfinityX properties
+ro.product.marketname=Xiaomi Mi 9
+ro.infinity.soc=Snapdragon® 855
+ro.infinity.battery=3300 mAh
+ro.infinity.display=2340 x 1080, 60 Hz
+ro.infinity.camera=48MP + 12MP + 16MP
