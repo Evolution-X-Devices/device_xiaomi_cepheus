@@ -18,7 +18,7 @@ PRODUCT_NAME := lineage_cepheus
 PRODUCT_DEVICE := cepheus
 PRODUCT_MANUFACTURER := Xiaomi
 PRODUCT_BRAND := Xiaomi
-PRODUCT_MODEL := MI 9
+PRODUCT_MODEL := Mi 9
 
 PRODUCT_GMS_CLIENTID_BASE := android-xiaomi
 
