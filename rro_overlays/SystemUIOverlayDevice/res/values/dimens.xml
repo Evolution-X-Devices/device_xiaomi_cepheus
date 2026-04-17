@@ -17,7 +17,10 @@
 -->
 <resources>
     <!-- the padding on the start of the statusbar -->
-    <dimen name="status_bar_padding_start">30px</dimen>
+    <dimen name="status_bar_padding_start">13.5dp</dimen>
+
+    <!-- the padding on the end of the statusbar -->
+    <dimen name="status_bar_padding_end">9dp</dimen>
 
     <!-- Microns/ums (1000 um = 1mm) per pixel for the given device. If unspecified, UI that
          relies on this value will not be sized correctly. -->
