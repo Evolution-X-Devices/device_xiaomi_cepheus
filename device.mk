@@ -29,6 +29,11 @@ PRODUCT_PACKAGES += \
     libmegface \
     libpiex_shim
 
+$(call soong_config_set,camera,package_name,com.android.camera)
+$(call soong_config_set_bool,camera,override_format_from_reserved,true)
+TARGET_USES_MIUI_CAMERA := true
+$(call inherit-product-if-exists, vendor/xiaomi/miuicamera-cepheus/config.mk)
+
 # Init
 $(call soong_config_set,xiaomi_msmnile,variant_lib,//$(LOCAL_PATH):libvariant_xiaomi_cepheus)
 
