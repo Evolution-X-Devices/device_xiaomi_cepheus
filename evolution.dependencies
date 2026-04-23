@@ -10,7 +10,7 @@
   },
   {
     "repository": "vendor_xiaomi_cepheus",
-    "target_path": "vendor/xiaomi/cepheus
+    "target_path": "vendor/xiaomi/cepheus"
   },
   {
     "repository": "vendor_xiaomi_miuicamera-cepheus",
