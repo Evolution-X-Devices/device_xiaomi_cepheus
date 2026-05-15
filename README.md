@@ -15,6 +15,8 @@
 
 Based on [LineageOS](https://github.com/LineageOS/android_device_xiaomi_cepheus) device tree, adapted for Android 16 builds.
 
+> **Still in development.** Some features may be broken or unstable.
+
 ## Features
 
 - FOD (under-display fingerprint) with screen-off unlock
