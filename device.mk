@@ -4,6 +4,15 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
+# ART / Dexpreopt
+PRODUCT_USES_DEFAULT_ART_CONFIG := true
+
+# Enable dexpreopt
+WITH_DEXPREOPT := true
+WITH_DEXPREOPT_DEBUG_INFO := false
+DEX_PREOPT_DEFAULT := speed-profile
+PRODUCT_SYSTEM_SERVER_COMPILER_FILTER := speed-profile
+
 TARGET_HAS_IR := true
 TARGET_HAS_UDFPS := true
 TARGET_IS_LEGACY := true
@@ -32,7 +41,7 @@ PRODUCT_PACKAGES += \
 $(call soong_config_set,camera,package_name,com.android.camera)
 $(call soong_config_set_bool,camera,override_format_from_reserved,true)
 TARGET_USES_MIUI_CAMERA := true
-$(call inherit-product-if-exists, vendor/xiaomi/miuicamera-cepheus/config.mk)
+$(call inherit-product-if-exists, vendor/xiaomi/miuicamera/config.mk)
 
 # Init
 $(call soong_config_set,xiaomi_msmnile,variant_lib,//$(LOCAL_PATH):libvariant_xiaomi_cepheus)
@@ -44,7 +53,12 @@ PRODUCT_PACKAGES += \
     LineageSDKOverlayDevice \
     LineageSystemUIOverlayDevice \
     SettingsOverlayDevice \
+    SmoothCutoutOverlay \
     SystemUIOverlayDevice
+
+# Power
+PRODUCT_COPY_FILES += \
+    $(LOCAL_PATH)/configs/etc/powerhint.json:$(TARGET_COPY_OUT_VENDOR)/etc/powerhint.json
 
 # Shipping API level
 PRODUCT_SHIPPING_API_LEVEL := 28
