@@ -2,7 +2,7 @@
   {
     "repository": "Evolution-X-Devices/device_xiaomi_sm8150-common",
     "target_path": "device/xiaomi/sm8150-common",
-    "branch": "bka-cepheus",
+    "branch": "cnb-cepheus",
     "remote": "github-non-los"
   },
   {
